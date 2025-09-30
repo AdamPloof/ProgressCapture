@@ -487,4 +487,5 @@ $RECYCLE.BIN/
 appsettings.Development.json
 
 # Dev Packages
+**/var/
 **/wwwroot/lib/

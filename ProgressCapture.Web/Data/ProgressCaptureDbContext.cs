@@ -9,6 +9,7 @@ namespace ProgressCapture.Web.Data;
 public class ProgressCaptureDbContext : DbContext {
     public DbSet<ProgressType> ProgressTypes { get; set; } = null!;
     public DbSet<ProgressEntry> ProgressEntries { get; set; } = null!;
+    public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; } = null!;
 
     public ProgressCaptureDbContext(
         DbContextOptions<ProgressCaptureDbContext> options
@@ -19,6 +20,7 @@ public class ProgressCaptureDbContext : DbContext {
 
         builder.Entity<ProgressType>().ToTable("progress_type");
         builder.Entity<ProgressEntry>().ToTable("progress_entry");
+        builder.Entity<UnitOfMeasure>().ToTable("unit_of_measure");
 
         // Configuring table and columns names to use snake case
         foreach (var entity in builder.Model.GetEntityTypes()) {
