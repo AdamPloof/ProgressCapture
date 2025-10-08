@@ -9,12 +9,6 @@ public class ProgressEntry {
     [Key]
     public int Id { get; set; }
 
-    [Required]
-    public int ProgressTypeId { get; set; }
-
-    [Required]
-    public int UnitOfMeasureId { get; set; }
-
     public DateTime? Date { get; set; }
 
     [Required]
@@ -24,8 +18,6 @@ public class ProgressEntry {
     public string? Notes { get; set; }
 
     [Required]
-    public ProgressType? ProgressType { get; set; }
-
-    [Required]
-    public UnitOfMeasure? UnitOfMeasure { get; set; }
+    public int ProgressTypeId { get; set; }
+    public ProgressType ProgressType { get; set; } = null!;
 }

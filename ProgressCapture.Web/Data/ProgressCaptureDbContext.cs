@@ -7,7 +7,8 @@ using ProgressCapture.Web.Extensions;
 namespace ProgressCapture.Web.Data;
 
 public class ProgressCaptureDbContext : DbContext {
-    public DbSet<ProgressType> ProgressTypes { get; set; } = null!;
+    public DbSet<Goal>          Goals { get; set; } = null!;
+    public DbSet<ProgressType>  ProgressTypes { get; set; } = null!;
     public DbSet<ProgressEntry> ProgressEntries { get; set; } = null!;
     public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; } = null!;
 
@@ -18,6 +19,7 @@ public class ProgressCaptureDbContext : DbContext {
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
 
+        builder.Entity<Goal>().ToTable("goal");
         builder.Entity<ProgressType>().ToTable("progress_type");
         builder.Entity<ProgressEntry>().ToTable("progress_entry");
         builder.Entity<UnitOfMeasure>().ToTable("unit_of_measure");

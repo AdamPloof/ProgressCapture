@@ -11,14 +11,38 @@ using ProgressCapture.Web.Data;
 namespace ProgressCapture.Web.Migrations
 {
     [DbContext(typeof(ProgressCaptureDbContext))]
-    [Migration("20250930012110_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251008034615_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
+
+            modelBuilder.Entity("ProgressCapture.Web.Models.Goal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_goal");
+
+                    b.ToTable("goal", (string)null);
+                });
 
             modelBuilder.Entity("ProgressCapture.Web.Models.ProgressEntry", b =>
                 {
@@ -44,18 +68,11 @@ namespace ProgressCapture.Web.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("progress_type_id");
 
-                    b.Property<int>("UnitOfMeasureId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("unit_of_measure_id");
-
                     b.HasKey("Id")
                         .HasName("pk_progress_entry");
 
                     b.HasIndex("ProgressTypeId")
                         .HasDatabaseName("ix_progress_entry_progress_type_id");
-
-                    b.HasIndex("UnitOfMeasureId")
-                        .HasDatabaseName("ix_progress_entry_unit_of_measure_id");
 
                     b.ToTable("progress_entry", (string)null);
                 });
@@ -72,14 +89,32 @@ namespace ProgressCapture.Web.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("description");
 
+                    b.Property<int>("GoalId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("goal_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnName("name");
 
+                    b.Property<int>("Target")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("target");
+
+                    b.Property<int>("UnitOfMeasureId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("unit_of_measure_id");
+
                     b.HasKey("Id")
                         .HasName("pk_progress_type");
+
+                    b.HasIndex("GoalId")
+                        .HasDatabaseName("ix_progress_type_goal_id");
+
+                    b.HasIndex("UnitOfMeasureId")
+                        .HasDatabaseName("ix_progress_type_unit_of_measure_id");
 
                     b.ToTable("progress_type", (string)null);
                 });
@@ -115,16 +150,33 @@ namespace ProgressCapture.Web.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_progress_entry_progress_type_progress_type_id");
 
+                    b.Navigation("ProgressType");
+                });
+
+            modelBuilder.Entity("ProgressCapture.Web.Models.ProgressType", b =>
+                {
+                    b.HasOne("ProgressCapture.Web.Models.Goal", "Goal")
+                        .WithMany("ProgressTypes")
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_progress_type_goal_goal_id");
+
                     b.HasOne("ProgressCapture.Web.Models.UnitOfMeasure", "UnitOfMeasure")
                         .WithMany()
                         .HasForeignKey("UnitOfMeasureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_progress_entry_unit_of_measure_unit_of_measure_id");
+                        .HasConstraintName("fk_progress_type_unit_of_measure_unit_of_measure_id");
 
-                    b.Navigation("ProgressType");
+                    b.Navigation("Goal");
 
                     b.Navigation("UnitOfMeasure");
+                });
+
+            modelBuilder.Entity("ProgressCapture.Web.Models.Goal", b =>
+                {
+                    b.Navigation("ProgressTypes");
                 });
 #pragma warning restore 612, 618
         }
