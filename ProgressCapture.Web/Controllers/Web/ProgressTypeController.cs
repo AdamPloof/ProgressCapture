@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
 using ProgressCapture.Web.ViewModels;
@@ -20,21 +20,30 @@ public class ProgressTypeController : Controller {
         _context = context;
     }
 
-    [HttpGet("add", Name = "AddProgressType")]
-    public IActionResult Add() {
-        return View(new ProgressTypeViewModel());
+    [HttpGet("add/{goalId}", Name = "AddProgressType")]
+    public IActionResult Add(int goalId) {
+        return View(new ProgressTypeViewModel() {GoalId = goalId});
     }
 
     [ValidateAntiForgeryToken]
-    [HttpPost("add", Name = "AddProgressType")]
-    public async Task<ActionResult> Add(ProgressTypeViewModel model, CancellationToken cancellation) {
+    [HttpPost("add/{goalId}", Name = "AddProgressType")]
+    public async Task<ActionResult> Add(
+        ProgressTypeViewModel model,
+        int goalId,
+        CancellationToken cancellation
+    ) {
         if (!ModelState.IsValid) {
             return View(model);
         }
 
+        // TODO: eventually we want to allow the user to select the uom
+        UnitOfMeasure uom = await _context.UnitOfMeasures.Where(u => u.Name == "Hours").FirstAsync();
+
         await _context.ProgressTypes.AddAsync(new ProgressType() {
             Name = model.Name,
             Description = model.Description,
+            GoalId = model.GoalId,
+            UnitOfMeasureId = uom.Id
         });
         await _context.SaveChangesAsync();
 

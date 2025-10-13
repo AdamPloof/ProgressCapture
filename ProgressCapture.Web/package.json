@@ -1,0 +1,35 @@
+{
+    "name": "progress-capture.web",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build": "webpack --mode production",
+        "dev": "webpack --watch"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@types/bootstrap": "^5.2.10",
+        "@types/react-dom": "^19.1.6",
+        "css-loader": "^7.1.2",
+        "jsxobj": "^1.1.0",
+        "mini-css-extract-plugin": "^2.9.2",
+        "sass": "^1.89.2",
+        "sass-loader": "^16.0.5",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.5.2",
+        "typescript": "^5.8.3",
+        "webpack": "^5.100.0",
+        "webpack-cli": "^6.0.1"
+    },
+    "dependencies": {
+        "@popperjs/core": "^2.11.8",
+        "@types/react": "^19.1.8",
+        "bootstrap": "^5.3.7",
+        "react": "^19.1.0",
+        "react-bootstrap": "^2.10.10",
+        "react-dom": "^19.1.0"
+    }
+}

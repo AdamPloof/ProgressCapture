@@ -1,0 +1,60 @@
+@import "fonts";
+@import "custom";
+@import "variables";
+
+// Main nav
+.sl-nav {
+    background-color: $sl-brown-lightest;
+}
+
+.navbar-brand {
+    font-family: "Antic Didone", serif;
+}
+
+
+.nav-utils {
+    display: none;
+
+    @include media-breakpoint-up(sm) {
+        display: block;
+    }
+}
+
+.sl-nav-container {
+    position: relative;
+
+    @each $bp, $max-width in $container-max-widths {
+        @include media-breakpoint-up($bp) {
+            max-width: $max-width;
+        }
+    }
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
+}
+
+.sl-nav-main {
+    padding-left: 0;
+    padding-right: 0;
+
+    @include media-breakpoint-up(sm) {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+// Sidebar
+.sl-sidebar {
+    min-width: 200px;
+    display: flex;
+    justify-content: start;
+
+    .nav-link {
+        color: $body-color;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

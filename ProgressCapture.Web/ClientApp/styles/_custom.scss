@@ -1,0 +1,32 @@
+@import "fonts";
+@import "variables";
+
+// Customize Bootrap variables
+
+// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
+@import "bootstrap/scss/functions";
+
+// 2. Include any default variable overrides here
+// $body-bg: $sl-brown-lighterer;
+// $headings-font-family: "Antic Didone", serif; 
+// $dropdown-link-hover-bg: #f3efe8;
+// $font-size-base: 1.125rem;
+// $border-color: $sl-brown-lighter;
+
+// 3. Include remaining bootstrap stylesheets
+@import "bootstrap/scss/bootstrap";
+
+// List groups
+// $list-group-hover-bg:               $sl-brown-lightest;
+// $list-group-active-color:           $sl-grey-darkerer;
+// $list-group-active-bg:              $sl-brown-lighter;
+// $list-group-active-border-color:    $sl-brown-light;
+
+// // $list-group-disabled-color:         var(--#{$prefix}secondary-color) !default;
+// $list-group-disabled-bg:            $list-group-bg;
+
+// // $list-group-action-color:           var(--#{$prefix}secondary-color) !default;
+// $list-group-action-hover-color:     $sl-brown-darker;
+
+// $list-group-action-active-color:    $sl-grey-darker;
+// $list-group-action-active-bg:       $sl-brown-lighter;

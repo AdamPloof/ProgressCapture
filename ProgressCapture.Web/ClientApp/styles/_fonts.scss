@@ -1,0 +1,12 @@
+// Headings: Antic Didone
+@import url('https://fonts.googleapis.com/css2?family=Antic+Didone&display=swap');
+
+@mixin theme-headings {
+  font-family: "Antic Didone", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.antic-didone-regular {
+  @include theme-headings();
+}

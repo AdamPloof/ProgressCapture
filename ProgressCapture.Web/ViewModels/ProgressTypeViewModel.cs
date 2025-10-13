@@ -9,4 +9,7 @@ public class ProgressTypeViewModel {
 
     [StringLength(1024, ErrorMessage = "Maximum length is {1}")]
     public string? Description { get; set; }
+
+    [Required]
+    public int GoalId { get; set; }
 }
