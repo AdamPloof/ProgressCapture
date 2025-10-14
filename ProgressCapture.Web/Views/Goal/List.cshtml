@@ -1,0 +1,13 @@
+@using ProgressCapture.Web.ViewModels
+@model GoalListViewModel
+
+<div class="container">
+    <h2>Goals</h2>
+    <ul class="list-group">
+        @foreach (GoalViewModel goal in Model.Goals) {
+            <li class="list-group-item">
+                <a asp-route="ViewGoal" asp-route-goalId="@goal.Id">@goal.Name</a>
+            </li>
+        }
+    </ul>
+</div>
