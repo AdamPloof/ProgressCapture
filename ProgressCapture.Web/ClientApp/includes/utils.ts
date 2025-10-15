@@ -1,7 +1,4 @@
-
-// Transformers are used to convert data returned by fetchData() into
-// the desired type
-type Transformer<T> = (data: any[]) => T[];
+import { Transformer } from "./transformers";
 
 /**
  * Simple wrapper around fetch() for retreiving json data
@@ -9,7 +6,7 @@ type Transformer<T> = (data: any[]) => T[];
  * @param {string} url 
  * @returns {Promise<T>}
  */
-export async function fetchData<T>(url: string, transformer: Transformer<T>): Promise<T[]> {
+export async function fetchData<T>(url: string, transformer: Transformer<T>): Promise<T> {
     const params = {
         method: 'GET',
         headers: {
