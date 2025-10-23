@@ -41,3 +41,26 @@ export function randChoice<T>(arr: Array<T>): T {
 export function uniqueKey(): string {
     return "id" + Math.random().toString(16).slice(2);
 }
+
+/**
+ * Replace placeholders in a URL
+ * 
+ * Example: 
+ * url = 'my-path/{id}/root/{name}'
+ * replacements = [42, 'foo']
+ * 
+ * returns 'my-path/42/root/foo'
+ * 
+ * @param {string} url 
+ * @param {string[]} replacements 
+ * @returns 
+ */
+export function replaceUrlPlaceholders(url: string, replacements: string[]): string {
+    let replacementIdx = 0;
+
+    return url.replace(/{[^]+}/g, () => {
+        const repl = replacements[replacementIdx++];
+
+        return repl !== undefined ? String(repl) : '';
+    });
+}

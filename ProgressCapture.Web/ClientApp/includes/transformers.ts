@@ -3,14 +3,27 @@
  */
 
 import {
+    Goal,
     ProgressEntry,
     ProgressType,
     UnitOfMeasure
 } from "types/entities";
 
-export type Transformer<T> = (data: any[]) => T;
+export type Transformer<T> = (data: any) => T;
 
-export function ProgressEntriesTransformer(data: any[]): ProgressEntry[] {
+// TODO: Need to handle situations where the data can't be transformed into T
+// such as when there is no entity for an ID
+export function goalTransformer(data: any): Goal {
+    const goal: Goal = {
+        id: Number(data.id),
+        name: String(data.name),
+        description: String(data.description)
+    };
+
+    return goal;
+}
+
+export function progressEntriesTransformer(data: any): ProgressEntry[] {
     const entries: ProgressEntry[] = [];
     for (const d of data) {
         const uom: UnitOfMeasure = {
@@ -39,4 +52,3 @@ export function ProgressEntriesTransformer(data: any[]): ProgressEntry[] {
 
     return entries;
 }
-

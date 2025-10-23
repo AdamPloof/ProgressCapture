@@ -2,6 +2,12 @@
  * Entities used throughout the app.
  */
 
+export interface Goal {
+    id: number;
+    name: string;
+    description: string;
+}
+
 export interface UnitOfMeasure {
     id: number;
     name: string;

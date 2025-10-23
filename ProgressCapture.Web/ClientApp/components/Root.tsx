@@ -1,6 +1,7 @@
 import React, { StrictMode } from "react";
 import { createRoot } from 'react-dom/client';
-import ComponentFactory from "./ComponentFactory";
+import GoalManager from "./Goals/GoalManager";
+import { WidgetProps } from "../types/props";
 
 function main(): void {
     const rootContainer: HTMLElement | null = document.getElementById('pc-root-container');
@@ -8,11 +9,12 @@ function main(): void {
         return;
     }
 
-    const Component = ComponentFactory(rootContainer.dataset.componentType ?? '');
+    // const Component = ComponentFactory(rootContainer.dataset.componentType ?? '');
+    const componentProps: WidgetProps = {entityId: Number(rootContainer.dataset.entityId) ?? null}
     const root = createRoot(rootContainer);
     root.render(
         <StrictMode>
-            <Component />
+            <GoalManager {...componentProps} />
         </StrictMode>
     );
 }
