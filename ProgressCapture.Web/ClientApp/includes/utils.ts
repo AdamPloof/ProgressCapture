@@ -58,7 +58,7 @@ export function uniqueKey(): string {
 export function replaceUrlPlaceholders(url: string, replacements: string[]): string {
     let replacementIdx = 0;
 
-    return url.replace(/{[^]+}/g, () => {
+    return url.replace(/{[^}]+}/g, () => {
         const repl = replacements[replacementIdx++];
 
         return repl !== undefined ? String(repl) : '';

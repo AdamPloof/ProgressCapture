@@ -24,6 +24,7 @@ public class GoalController : Controller {
         }
 
         return View(new GoalViewModel() {
+            Id = goal.Id,
             Name = goal.Name,
             Description = goal.Description
         });
