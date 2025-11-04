@@ -64,3 +64,9 @@ export function replaceUrlPlaceholders(url: string, replacements: string[]): str
         return repl !== undefined ? String(repl) : '';
     });
 }
+
+export function formatDateYmd(date: Date): string {
+    const dateStr = date.toISOString().split('T')[0];
+
+    return dateStr;
+}

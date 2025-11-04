@@ -2,9 +2,17 @@ import React, { JSX, useState, useEffect } from 'react';
 import AddProgressModal from './AddProgressModal';
 import { WidgetProps } from 'types/props';
 import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
-import { Goal, ProgressEntry } from '../../types/entities';
-import { goalTransformer, progressEntriesTransformer } from '../../includes/transformers';
-import { URL_GOAL, URL_GOAL_PROGRESS } from '../../includes/paths';
+import { Goal, ProgressEntry, ProgressType } from '../../types/entities';
+import {
+    goalTransformer,
+    progressEntriesTransformer,
+    progressTypeTransformer
+} from '../../includes/transformers';
+import {
+    URL_GOAL,
+    URL_GOAL_PROGRESS,
+    URL_GOAL_PROGRESS_TYPES
+} from '../../includes/paths';
 
 // TODO: add interface for adding new progress entries
 
@@ -14,6 +22,7 @@ import { URL_GOAL, URL_GOAL_PROGRESS } from '../../includes/paths';
 export default function GoalManager(props: WidgetProps): JSX.Element {
     const [goal, setGoal] = useState<Goal | null>(null);
     const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
+    const [progressTypes, setProgressTypes] = useState<ProgressType[]>([]);
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
     const [entryLoading, setEntryLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -23,8 +32,9 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const handleShowModal = () => setShowModal(true);
 
     useEffect(() => {
-        fetchProgressEntries();
         fetchGoal();
+        fetchProgressEntries();
+        fetchProgressTypes();
     }, []);
 
     const fetchGoal = async (): Promise<void> => {
@@ -52,6 +62,17 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             console.error(e);
             setError('Unable to Progress Entries. Please try again.');
             setEntryLoading(false);
+        }
+    };
+
+    const fetchProgressTypes = async (): Promise<void> => {
+        // Background fetch, no loading indicator needed.
+        try {
+            const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS_TYPES, [String(props.entityId)]);
+            const types = await fetchData<ProgressType[]>(url, progressTypeTransformer);
+            setProgressTypes([...types]);
+        } catch (e) {
+            console.error(e);
         }
     };
 
@@ -110,6 +131,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             </div>
             <AddProgressModal
                 show={showModal}
+                progressTypes={progressTypes}
                 handleShow={handleShowModal}
                 handleClose={handleCloseModal}
                 addProgress={addProgress}

@@ -23,6 +23,15 @@ public class GoalController : ControllerBase {
         return Ok(goal);
     }
 
+    [HttpGet("{goalId}/progress-types")]
+    public async Task<IActionResult> GetProgressEntryTypes(int goalId) {
+        List<ProgressType> entryTypes = await _context.ProgressTypes.Where(t => t.GoalId == goalId)
+            .Include(t => t.UnitOfMeasure)
+            .ToListAsync();
+
+        return Ok(entryTypes);
+    }
+
     [HttpGet("{goalId}/progress")]
     public async Task<IActionResult> GetProgressEntries(int goalId) {
         // TODO: project related records

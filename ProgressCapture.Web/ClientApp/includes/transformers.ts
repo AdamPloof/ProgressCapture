@@ -52,3 +52,27 @@ export function progressEntriesTransformer(data: any): ProgressEntry[] {
 
     return entries;
 }
+
+export function progressTypeTransformer(data: any): ProgressType[] {
+    const types: ProgressType[] = [];
+    for (const d of data) {
+        const uom: UnitOfMeasure = {
+            id: d.unitOfMeasure.id,
+            name: d.unitOfMeasure.name,
+            shortName: d.unitOfMeasure.shortName,
+        };
+
+        const type: ProgressType = {
+            id: d.id,
+            name: d.name,
+            description: d.description,
+            goalId: d.goalId,
+            unitOfMeasure: uom,
+            target: d.target
+        };
+
+        types.push(type);
+    }
+
+    return types;
+}
