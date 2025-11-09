@@ -30,3 +30,11 @@ export interface ProgressEntry {
     notes: string | null;
     progressType: ProgressType;
 }
+
+export interface ProgressEntryInputModel {
+    goalId: number;
+    date: Date;
+    amount: number;
+    notes: string | null;
+    progressTypeId: number;
+}

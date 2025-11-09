@@ -12,7 +12,7 @@ public class ProgressEntry {
     public DateTime? Date { get; set; }
 
     [Required]
-    public required int Amount { get; set; }
+    public required double Amount { get; set; }
 
     [MaxLength(1024)]
     public string? Notes { get; set; }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProgressCapture.Web.Data;
 
@@ -10,9 +11,11 @@ using ProgressCapture.Web.Data;
 namespace ProgressCapture.Web.Migrations
 {
     [DbContext(typeof(ProgressCaptureDbContext))]
-    partial class ProgressCaptureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251109204200_UpdateProgressAmountType")]
+    partial class UpdateProgressAmountType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");

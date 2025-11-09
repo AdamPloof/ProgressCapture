@@ -27,16 +27,16 @@ export function progressEntriesTransformer(data: any): ProgressEntry[] {
     const entries: ProgressEntry[] = [];
     for (const d of data) {
         const uom: UnitOfMeasure = {
-            id: d.uom.id,
-            name: d.uom.name,
-            shortName: d.uom.shortName
+            id: d.progressType.unitOfMeasure.id,
+            name: d.progressType.unitOfMeasure.name,
+            shortName: d.progressType.unitOfMeasure.shortName
         };
         const type: ProgressType = {
-            id: d.type.id,
-            name: d.type.name,
-            description: d.type.description,
-            target: d.type.target,
-            goalId: d.type.goalId,
+            id: d.progressType.id,
+            name: d.progressType.name,
+            description: d.progressType.description,
+            target: d.progressType.target,
+            goalId: d.progressType.goalId,
             unitOfMeasure: uom,
         };
         const entry: ProgressEntry = {

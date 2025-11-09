@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { AddProgressModalProps } from 'types/props';
 import { formatDateYmd } from '../../includes/utils';
-import { ProgressType } from 'types/entities';
+import { ProgressType, ProgressEntry } from 'types/entities';
 
 export default function AddProgressModal(props: AddProgressModalProps): JSX.Element {
     const [progressType, setProgressType] = useState<ProgressType | null>(null);
@@ -14,7 +14,17 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
 
     const handleSave = (): void => {
         setIsSubmitted(true);
-        props.handleClose();
+        if (submissionIsValid()) {
+            const progress: ProgressEntry = {
+                id: -1,
+                date: progressDate!,
+                amount: units,
+                notes: notes,
+                progressType: progressType!
+            };
+            props.addProgress(progress);
+            props.handleClose();
+        }
     };
 
     const handleChangeProgressType = (progressTypeId: number) => {
@@ -22,6 +32,19 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
         if (type !== undefined) {
             setProgressType(type);
         }
+    };
+
+    const submissionIsValid = (): boolean => {
+        let isValid = true;
+        if (progressType === null) {
+            isValid = false;
+        } else if (units <= 0) {
+            isValid = false;
+        } else if (progressDate === null) {
+            isValid = false;
+        }
+
+        return isValid;
     };
 
     const unitOfMeasureName = (): string => {

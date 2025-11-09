@@ -2,7 +2,12 @@ import React, { JSX, useState, useEffect } from 'react';
 import AddProgressModal from './AddProgressModal';
 import { WidgetProps } from 'types/props';
 import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
-import { Goal, ProgressEntry, ProgressType } from '../../types/entities';
+import {
+    Goal,
+    ProgressEntry,
+    ProgressType,
+    ProgressEntryInputModel
+} from '../../types/entities';
 import {
     goalTransformer,
     progressEntriesTransformer,
@@ -11,10 +16,9 @@ import {
 import {
     URL_GOAL,
     URL_GOAL_PROGRESS,
-    URL_GOAL_PROGRESS_TYPES
+    URL_GOAL_PROGRESS_TYPES,
+    URL_GOAL_ADD_PROGRESS,
 } from '../../includes/paths';
-
-// TODO: add interface for adding new progress entries
 
 /**
  * The main component for managing the progress entries related to a specific goal.
@@ -77,13 +81,46 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     };
 
     const addProgress = async (progress: ProgressEntry): Promise<void> => {
+        if (!goal) {
+            throw new Error('Unable to submit progress entry. Goal is undefined');
+        }
 
+        const progressData: ProgressEntryInputModel = {
+            goalId: goal.id,
+            date: progress.date,
+            amount: progress.amount,
+            notes: progress.notes,
+            progressTypeId: progress.progressType.id
+        };
+
+        const params = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(progressData)
+        };
+        const res = await fetch(URL_GOAL_ADD_PROGRESS, params);
+        if (!res.ok) {
+            // TODO: display error to user
+            console.error(`HTTP Error! Status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        progress.id = data.id;
+        setProgressEntries([progress, ...progressEntries]);
     };
 
     const tableRow = (entry: ProgressEntry): JSX.Element => {
+        const dateOpts: Intl.DateTimeFormatOptions = {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        };
+
         return(
             <tr key={`tr-${entry.id}`}>
-                <td>{entry.date.toDateString()}</td>
+                <td>{entry.date.toLocaleDateString('en-US', dateOpts)}</td>
                 <td>{entry.progressType.name}</td>
                 <td>{entry.amount}</td>
                 <td>{entry.notes}</td>
