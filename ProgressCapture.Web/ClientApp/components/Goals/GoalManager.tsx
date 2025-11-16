@@ -1,5 +1,7 @@
 import React, { JSX, useState, useEffect } from 'react';
-import AddProgressModal from './AddProgressModal';
+import ProgressModal from './ProgressModal';
+import ProgressOptions from './ProgressOptions';
+import Loader from '../Common/Loader';
 import { WidgetProps } from 'types/props';
 import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
 import {
@@ -17,7 +19,8 @@ import {
     URL_GOAL,
     URL_GOAL_PROGRESS,
     URL_GOAL_PROGRESS_TYPES,
-    URL_GOAL_ADD_PROGRESS,
+    URL_ADD_PROGRESS,
+    URL_UPDATE_PROGRESS,
 } from '../../includes/paths';
 
 /**
@@ -27,6 +30,15 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const [goal, setGoal] = useState<Goal | null>(null);
     const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
     const [progressTypes, setProgressTypes] = useState<ProgressType[]>([]);
+    const [inputModel, setInputModel] = useState<ProgressEntryInputModel>({
+        id: null,
+        goalId: null,
+        date: null,
+        amount: 0,
+        notes: null,
+        progressTypeId: null
+    });
+
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
     const [entryLoading, setEntryLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -80,35 +92,183 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         }
     };
 
-    const addProgress = async (progress: ProgressEntry): Promise<void> => {
+    const handleSaveProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
+        if (progressInput.id === null) {
+            addProgress(progressInput);
+        } else {
+            updateProgress(progressInput);
+        }
+    };
+
+    const addProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
         if (!goal) {
             throw new Error('Unable to submit progress entry. Goal is undefined');
         }
 
-        const progressData: ProgressEntryInputModel = {
-            goalId: goal.id,
-            date: progress.date,
-            amount: progress.amount,
-            notes: progress.notes,
-            progressTypeId: progress.progressType.id
-        };
+        if (!progressInput.date) {
+            throw new Error('Date for new progress entry is empty');
+        }
+        
+        if (progressInput.progressTypeId === null) {
+            throw new Error('Progress Type for new progress entry is empty');
+        }
+
+        const entryType: ProgressType | undefined = progressTypes.find(
+            t => t.id === progressInput.progressTypeId
+        );
+        if (!entryType) {
+            throw new Error(`Could not find progress type for id: ${progressInput.progressTypeId}`);
+        }
 
         const params = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(progressData)
+            body: JSON.stringify(progressInput)
         };
-        const res = await fetch(URL_GOAL_ADD_PROGRESS, params);
+        const res = await fetch(URL_ADD_PROGRESS, params);
+        if (!res.ok) {
+            // TODO: display error to user
+            console.error(`HTTP Error! Status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        const entryId: number = Number(data.id);
+        const entryDate: Date = progressInput.date
+        const newProgress: ProgressEntry = {
+            id: entryId,
+            date: entryDate,
+            amount: progressInput.amount ?? 0,
+            notes: progressInput.notes,
+            progressType: entryType
+        };
+        setProgressEntries([newProgress, ...progressEntries]);
+    };
+
+    const updateProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
+        if (!goal) {
+            throw new Error('Unable to submit progress entry. Goal is undefined');
+        }
+
+        if (!progressInput.id) {
+            throw new Error('Unable to submit progress entry. ID not provided');
+        }
+
+        if (!progressInput.date) {
+            throw new Error('Date for new progress entry is empty');
+        }
+        
+        if (progressInput.progressTypeId === null) {
+            throw new Error('Progress Type for new progress entry is empty');
+        }
+
+        const entryType: ProgressType | undefined = progressTypes.find(
+            t => t.id === progressInput.progressTypeId
+        );
+        if (!entryType) {
+            throw new Error(`Could not find progress type for id: ${progressInput.progressTypeId}`);
+        }
+
+        const url = replaceUrlPlaceholders(URL_UPDATE_PROGRESS, [String(progressInput.id)]);
+        const params = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(progressInput)
+        };
+        const res = await fetch(url, params);
         if (!res.ok) {
             // TODO: display error to user
             console.error(`HTTP Error! Status: ${res.status}`);
         }
 
         const data = await res.json();
-        progress.id = data.id;
-        setProgressEntries([progress, ...progressEntries]);
+        const entryId: number = Number(data.id);
+        const entryDate: Date = progressInput.date
+        const newEntries = [...progressEntries];
+        for (const entry of newEntries) {
+            if (entry.id !== entryId) {
+                continue;
+            }
+
+            entry.date = entryDate;
+            entry.amount = progressInput.amount ?? 0;
+            entry.progressType = entryType;
+            entry.notes = progressInput.notes;
+        }
+
+        setProgressEntries(newEntries);
+    };
+
+    const handleAddProgressEntry = (): void => {
+        if (!goal) {
+            throw new Error('Unable to add new progress entry. Goal is empty');
+        }
+
+        setInputModel({
+            id: null,
+            goalId: goal.id,
+            date: null,
+            amount: 0,
+            notes: null,
+            progressTypeId: null
+        });
+        handleShowModal();
+    };
+
+    const handleEditProgressEntry = (entryId: number): void => {
+        const selectedEntry = progressEntries.find(e => e.id === entryId);
+        if (!selectedEntry) {
+            throw new Error(`Unable to edit entry. Could not find entry for id ${entryId}.`);
+        }
+
+        setInputModel({
+            id: entryId,
+            goalId: selectedEntry.progressType.goalId,
+            date: selectedEntry.date,
+            amount: selectedEntry.amount,
+            notes: selectedEntry.notes,
+            progressTypeId: selectedEntry.progressType.id
+        });
+        handleShowModal();
+    };
+
+    const handleDeleteProgressEntry = (entryId: number): void => {
+        // TODO: show confirmation modal, confirm delete through that.
+        console.log(`Editing progress: ${entryId}`);
+    };
+
+    const progressTable = (): JSX.Element => {
+        if (error !== null) {
+            return (
+                <p className="text-danger">
+                    {error}
+                </p>
+            );
+        }
+
+        if (entryLoading) {
+            return <Loader />;
+        }
+
+        return (
+            <table className={progressEntries.length > 1 ? 'table table-striped' : 'table'}>
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Hours</th>
+                        <th scope="col">Notes</th>
+                        <th scope="col">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {progressEntries.length > 0 ? progressEntries.map(e => tableRow(e)): noEntriesRow()}
+                </tbody>
+            </table>
+        );
     };
 
     const tableRow = (entry: ProgressEntry): JSX.Element => {
@@ -124,6 +284,13 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
                 <td>{entry.progressType.name}</td>
                 <td>{entry.amount}</td>
                 <td>{entry.notes}</td>
+                <td>
+                    <ProgressOptions
+                        entryId={entry.id}
+                        handleEdit={handleEditProgressEntry}
+                        handleDelete={handleDeleteProgressEntry}
+                    ></ProgressOptions>
+                </td>
             </tr>
         );
     }
@@ -137,42 +304,41 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     }
 
     const widgetHeader = (): JSX.Element => {
+        if (goalLoading) {
+            return (
+                <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
+                    <div className="header-info"><h2>{goal ? goal.name : '...'}</h2></div>
+                </div>    
+            );
+        }
+
         return (
             <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
                 <div className="header-info"><h2>{goal ? goal.name : '...'}</h2></div>
                 <div className="header-tools d-flex justify-content-end">
-                    <button className='btn btn-primary' onClick={handleShowModal}>Add Progress</button>
+                    <button className='btn btn-primary' onClick={handleAddProgressEntry}>
+                        Add Progress
+                    </button>
                 </div>
             </div>
         );
     }
 
-    // TODO: handle loading entries, goal details, error
     return (
         <React.Fragment>
             <div className="goal-manager container border">
                 {widgetHeader()}
-                <table className={progressEntries.length > 1 ? 'table table-striped' : 'table'}>
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Hours</th>
-                            <th scope="col">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {progressEntries.length > 0 ? progressEntries.map(e => tableRow(e)): noEntriesRow()}
-                    </tbody>
-                </table>
+                {progressTable()}
             </div>
-            <AddProgressModal
+            <ProgressModal
                 show={showModal}
+                inputModel={inputModel}
+                setInputModel={setInputModel}
                 progressTypes={progressTypes}
                 handleShow={handleShowModal}
                 handleClose={handleCloseModal}
-                addProgress={addProgress}
-            ></AddProgressModal>
+                handleSaveProgress={handleSaveProgress}
+            ></ProgressModal>
         </React.Fragment>
     );
 }

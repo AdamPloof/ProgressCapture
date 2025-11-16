@@ -38,6 +38,12 @@ export function randChoice<T>(arr: Array<T>): T {
     return arr[randInt(arr.length)];
 }
 
+/**
+ * Generates a psuedo-random unique key. Useful for generating keys for
+ * lists of elements
+ * 
+ * @returns {string}
+ */
 export function uniqueKey(): string {
     return "id" + Math.random().toString(16).slice(2);
 }
@@ -65,8 +71,60 @@ export function replaceUrlPlaceholders(url: string, replacements: string[]): str
     });
 }
 
+/**
+ * Format a Date as a string in yyyy-mm-dd format
+ * 
+ * @param {Date} date
+ * @returns {string}
+ */
 export function formatDateYmd(date: Date): string {
     const dateStr = date.toISOString().split('T')[0];
 
     return dateStr;
+}
+
+/**
+ * Returns a copy of a string converted to sentence case
+ * 
+ * Example
+ * input: this is my sentence
+ * output: This is my sentence
+ * 
+ * 
+ * @param {string} str
+ * @returns {string}
+ */
+export function sentenceCase(str: string): string {
+    if (str.length === 0) {
+        return str;
+    }
+
+    let formatted = str.toLowerCase();
+
+    return formatted.charAt(0).toUpperCase() + formatted.substring(1);
+}
+
+/**
+ * Returns a copy of a string converted to title case
+ * 
+ * Example
+ * input: this is my title
+ * output: This Is My Title
+ * 
+ * 
+ * @param {string} str
+ * @returns {string}
+ */
+export function titleCase(str: string): string {
+    if (str.length === 0) {
+        return str;
+    }
+
+    const capitalizeWord = (word: string): string => {
+        return word.charAt(0).toUpperCase() + word.substring(1);
+    }
+
+    const words = str.toLowerCase().split(' ').map(capitalizeWord);
+
+    return words.join(' ');
 }

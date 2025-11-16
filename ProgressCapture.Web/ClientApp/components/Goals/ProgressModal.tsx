@@ -1,64 +1,51 @@
 import { useState, JSX } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { AddProgressModalProps } from 'types/props';
+import { ProgressModalProps } from 'types/props';
+import { titleCase } from '../../includes/utils';
 import { formatDateYmd } from '../../includes/utils';
-import { ProgressType, ProgressEntry } from 'types/entities';
 
-export default function AddProgressModal(props: AddProgressModalProps): JSX.Element {
-    const [progressType, setProgressType] = useState<ProgressType | null>(null);
-    const [progressDate, setProgressDate] = useState<Date | null>(null);
-    const [units, setUnits] = useState<number>(0);
-    const [notes, setNotes] = useState<string>('');
+export default function ProgressModal(props: ProgressModalProps): JSX.Element {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+
+    const unitOfMeasureName = (): string => {
+        if (props.inputModel.progressTypeId === null) {
+            return 'units';
+        }
+
+        const uomName: string | undefined = props.progressTypes.find(t => {
+            return t.id === props.inputModel.progressTypeId;
+        })?.unitOfMeasure.name;
+
+        return uomName ?? 'units';
+    };
 
     const handleSave = (): void => {
         setIsSubmitted(true);
         if (submissionIsValid()) {
-            const progress: ProgressEntry = {
-                id: -1,
-                date: progressDate!,
-                amount: units,
-                notes: notes,
-                progressType: progressType!
-            };
-            props.addProgress(progress);
+            props.handleSaveProgress(props.inputModel);
             props.handleClose();
-        }
-    };
-
-    const handleChangeProgressType = (progressTypeId: number) => {
-        const type = props.progressTypes.find(t => t.id == progressTypeId);
-        if (type !== undefined) {
-            setProgressType(type);
         }
     };
 
     const submissionIsValid = (): boolean => {
         let isValid = true;
-        if (progressType === null) {
+        const amount = props.inputModel.amount ?? 0;
+        if (props.inputModel.progressTypeId === null) {
             isValid = false;
-        } else if (units <= 0) {
+        } else if (amount <= 0) {
             isValid = false;
-        } else if (progressDate === null) {
+        } else if (props.inputModel.date === null) {
             isValid = false;
         }
 
         return isValid;
     };
 
-    const unitOfMeasureName = (): string => {
-        if (!progressType) {
-            return 'units';
-        }
-
-        return progressType.unitOfMeasure.name.toLocaleLowerCase();
-    };
-
     const progressTypeClass = (): string => {
         if (!isSubmitted) {
             return 'form-select';
-        } else if (progressType !== null) {
+        } else if (props.inputModel.progressTypeId !== null) {
             return 'form-select';
         }
 
@@ -66,9 +53,10 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
     };
 
     const unitsClass = (): string => {
+        const amount = props.inputModel.amount ?? 0;
         if (!isSubmitted) {
             return 'form-control';
-        } else if (units > 0) {
+        } else if (amount > 0) {
             return 'form-control';
         }
 
@@ -78,7 +66,7 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
     const progressDateClass = (): string => {
         if (!isSubmitted) {
             return 'form-control';
-        } else if (progressDate !== null) {
+        } else if (props.inputModel.date !== null) {
             return 'form-control';
         }
 
@@ -98,9 +86,11 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
                             name="progress-type"
                             id="progress-type"
                             className={progressTypeClass()}
-                            value={progressType ? progressType.id : ''}
+                            value={props.inputModel.progressTypeId ? props.inputModel.progressTypeId : ''}
                             onChange={e => {
-                                handleChangeProgressType(Number(e.target.value));
+                                const newModel = {...props.inputModel};
+                                newModel.progressTypeId = Number(e.target.value);
+                                props.setInputModel(newModel);
                             }}
                         >
                             <option disabled value="">Select progress type...</option>
@@ -122,22 +112,30 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
                                 name='progress-date'
                                 type="date"
                                 className={progressDateClass()}
-                                value={progressDate ? formatDateYmd(progressDate) : ''}
+                                value={props.inputModel.date ? formatDateYmd(props.inputModel.date) : ''}
                                 onChange={e => {
-                                    setProgressDate(new Date(e.target.value));
+                                    const newModel = {...props.inputModel};
+                                    newModel.date = new Date(e.target.value);
+                                    props.setInputModel(newModel);
                                 }}
                             />
                             <div className="invalid-feedback">Please select a valid date</div>
                         </div>
                         <div className="col">
-                            <label htmlFor="progress-units">Hours</label>
+                            <label htmlFor="progress-units">{titleCase(unitOfMeasureName())}</label>
                             <input
                                 name='progress-units'
                                 type="number"
                                 className={unitsClass()}
-                                value={units}
+                                value={props.inputModel.amount ?? ''}
                                 onChange={e => {
-                                    setUnits(Number(e.target.value));
+                                    const newModel = {...props.inputModel};
+                                    if (e.target.value === '') {
+                                        newModel.amount = null;
+                                    } else {
+                                        newModel.amount = Number(e.target.value);
+                                    }
+                                    props.setInputModel(newModel);
                                 }}
                             />
                             <div className="invalid-feedback">
@@ -152,9 +150,11 @@ export default function AddProgressModal(props: AddProgressModalProps): JSX.Elem
                             id="progress-notes"
                             className='form-control'
                             rows={3}
-                            value={notes}
+                            value={props.inputModel.notes ?? ''}
                             onChange={e => {
-                                setNotes(e.target.value);
+                                const newModel = {...props.inputModel};
+                                newModel.notes = e.target.value;
+                                props.setInputModel(newModel);
                             }}
                         ></textarea>
                     </div>

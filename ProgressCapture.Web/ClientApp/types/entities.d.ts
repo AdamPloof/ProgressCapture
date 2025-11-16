@@ -32,9 +32,10 @@ export interface ProgressEntry {
 }
 
 export interface ProgressEntryInputModel {
-    goalId: number;
-    date: Date;
-    amount: number;
+    id: number | null;
+    goalId: number | null;
+    date: Date | null;
+    amount: number | null;
     notes: string | null;
-    progressTypeId: number;
+    progressTypeId: number | null;
 }
