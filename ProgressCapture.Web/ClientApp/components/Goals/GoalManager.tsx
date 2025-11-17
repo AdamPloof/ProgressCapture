@@ -2,6 +2,7 @@ import React, { JSX, useState, useEffect } from 'react';
 import ProgressModal from './ProgressModal';
 import ProgressOptions from './ProgressOptions';
 import Loader from '../Common/Loader';
+import ConfirmationModal from '../Common/ConfirmationModal';
 import { WidgetProps } from 'types/props';
 import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
 import {
@@ -21,12 +22,19 @@ import {
     URL_GOAL_PROGRESS_TYPES,
     URL_ADD_PROGRESS,
     URL_UPDATE_PROGRESS,
+    URL_DELETE_PROGRESS,
 } from '../../includes/paths';
 
 /**
  * The main component for managing the progress entries related to a specific goal.
  */
 export default function GoalManager(props: WidgetProps): JSX.Element {
+    const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    };
+
     const [goal, setGoal] = useState<Goal | null>(null);
     const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
     const [progressTypes, setProgressTypes] = useState<ProgressType[]>([]);
@@ -39,6 +47,9 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         progressTypeId: null
     });
 
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+    const [deleteConfirmationMsg, setDeleteConfirmationMsg] = useState<string | JSX.Element>('');
+
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
     const [entryLoading, setEntryLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -46,6 +57,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
+    const handleCloseDeleteConfirmation = () => setShowDeleteConfirmation(false);
 
     useEffect(() => {
         fetchGoal();
@@ -144,6 +156,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             progressType: entryType
         };
         setProgressEntries([newProgress, ...progressEntries]);
+        resetInputModel();
     };
 
     const updateProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
@@ -200,6 +213,25 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         }
 
         setProgressEntries(newEntries);
+        resetInputModel();
+    };
+
+    const deleteProgress = async (progressId: number): Promise<void> => {
+        const url = replaceUrlPlaceholders(URL_DELETE_PROGRESS, [String(progressId)]);
+        const params = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        };
+        const res = await fetch(url, params);
+        if (!res.ok) {
+            // TODO: display error to user
+            console.error(`HTTP Error! Status: ${res.status}`);
+        }
+
+        setProgressEntries(progressEntries.filter(p => p.id !== progressId));
+        resetInputModel();
     };
 
     const handleAddProgressEntry = (): void => {
@@ -237,7 +269,52 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
 
     const handleDeleteProgressEntry = (entryId: number): void => {
         // TODO: show confirmation modal, confirm delete through that.
-        console.log(`Editing progress: ${entryId}`);
+        setInputModel({
+            id: entryId,
+            goalId: null,
+            date: null,
+            amount: 0,
+            notes: null,
+            progressTypeId: null
+        });
+        const targetEntry = progressEntries.find(p => p.id === entryId);
+        if (!targetEntry) {
+            throw new Error(`Could not delete progress entry. No progress found for ID: ${entryId}`);
+        }
+
+        const msg = (
+            <React.Fragment>
+                <p>Are you sure you want to delete this progress?</p>
+                <ul>
+                    <li>
+                        <strong>Date:</strong> {targetEntry.date.toLocaleDateString('en-US', DATE_FORMAT_OPS)}
+                    </li>
+                    <li>
+                        <strong>Type:</strong> {targetEntry.progressType.name}
+                    </li>
+                    <li>
+                        <strong>Amount:</strong> {targetEntry.amount}
+                    </li>
+                    <li>
+                        <strong>Notes:</strong> {targetEntry.notes}
+                    </li>
+                </ul>
+            </React.Fragment>
+        );
+
+        setDeleteConfirmationMsg(msg);
+        setShowDeleteConfirmation(true);
+    };
+
+    const resetInputModel = (): void => {
+        setInputModel({
+            id: null,
+            goalId: null,
+            date: null,
+            amount: 0,
+            notes: null,
+            progressTypeId: null
+        });
     };
 
     const progressTable = (): JSX.Element => {
@@ -272,15 +349,9 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     };
 
     const tableRow = (entry: ProgressEntry): JSX.Element => {
-        const dateOpts: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        };
-
         return(
             <tr key={`tr-${entry.id}`}>
-                <td>{entry.date.toLocaleDateString('en-US', dateOpts)}</td>
+                <td>{entry.date.toLocaleDateString('en-US', DATE_FORMAT_OPS)}</td>
                 <td>{entry.progressType.name}</td>
                 <td>{entry.amount}</td>
                 <td>{entry.notes}</td>
@@ -339,6 +410,16 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
                 handleClose={handleCloseModal}
                 handleSaveProgress={handleSaveProgress}
             ></ProgressModal>
+            <ConfirmationModal
+                show={showDeleteConfirmation}
+                title={'Delete Progress'}
+                message={deleteConfirmationMsg}
+                confirmBtnText={'Delete'}
+                confirmClass={'danger'}
+                inputModel={inputModel}
+                handleConfirm={deleteProgress}
+                handleClose={handleCloseDeleteConfirmation}
+            ></ConfirmationModal>
         </React.Fragment>
     );
 }

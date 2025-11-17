@@ -9,19 +9,24 @@ export default function ConfirmationModal(props: ConfirmationModalProps): JSX.El
     return (
         <Modal
             show={props.show}
-            onHide={props.handleCancel}
+            onHide={props.handleClose}
         >
             <Modal.Header closeButton>
                 <Modal.Title>{props.title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>
-                    {props.message}
-                </p>
+                {props.message}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant='secondary' onClick={props.handleCancel}>Cancel</Button>
-                <Button variant={confirmClass} onClick={props.handleConfirm}>Save</Button>
+                <Button variant='secondary' onClick={props.handleClose}>Cancel</Button>
+                <Button variant={confirmClass} onClick={() => {
+                    if (props.inputModel.id === null) {
+                        throw new Error('Unable to delete progress entry. Progress ID is null.');
+                    }
+
+                    props.handleConfirm(props.inputModel.id);
+                    props.handleClose();
+                }}>{props.confirmBtnText ?? 'Save'}</Button>
             </Modal.Footer>
         </Modal>
     );

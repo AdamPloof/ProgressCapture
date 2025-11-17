@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import {
     ProgressEntry,
     ProgressEntryInputModel,
@@ -28,8 +28,10 @@ export interface ProgressOptionsProps {
 export interface ConfirmationModalProps {
     show: boolean;
     title: string;
-    message: string;
+    message: string | JSX.Element;
     confirmClass: string?;
-    handleConfirm: () => void;
-    handleCancel: () => void;
+    confirmBtnText: string?;
+    inputModel: ProgressEntryInputModel;
+    handleConfirm: (progressId: number) => Promise<void>;
+    handleClose: () => void;
 }
