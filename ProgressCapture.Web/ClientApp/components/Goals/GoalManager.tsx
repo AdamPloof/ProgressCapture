@@ -3,6 +3,7 @@ import ProgressModal from './ProgressModal';
 import ProgressOptions from './ProgressOptions';
 import Loader from '../Common/Loader';
 import ConfirmationModal from '../Common/ConfirmationModal';
+import AlertDismissible from '../Common/AlertDismissable';
 import { WidgetProps } from 'types/props';
 import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
 import {
@@ -58,6 +59,9 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
     const handleCloseDeleteConfirmation = () => setShowDeleteConfirmation(false);
+    const handleCloseErrorAlert = () => {
+        setError(null);
+    };
 
     useEffect(() => {
         fetchGoal();
@@ -72,9 +76,10 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             const goal = await fetchData(url, goalTransformer);
             setGoal(goal);
             setGoalLoading(false);
-        } catch (e) {
-            console.error(e);
-            setError('Unable to fetch Goal info. Please try again.');
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(`Unable to load goal. Error: ${err.message}`);
+            }
             setGoalLoading(false);
         }
     };
@@ -86,9 +91,10 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             const entries = await fetchData<ProgressEntry[]>(url, progressEntriesTransformer);
             setProgressEntries([...entries]);
             setEntryLoading(false);
-        } catch (e) {
-            console.error(e);
-            setError('Unable to Progress Entries. Please try again.');
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(`Unable to load progress entries. Error: ${err.message}`);
+            }
             setEntryLoading(false);
         }
     };
@@ -99,16 +105,24 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS_TYPES, [String(props.entityId)]);
             const types = await fetchData<ProgressType[]>(url, progressTypeTransformer);
             setProgressTypes([...types]);
-        } catch (e) {
-            console.error(e);
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(`Unable to load progress types. Error: ${err.message}`);
+            }
         }
     };
 
     const handleSaveProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
-        if (progressInput.id === null) {
-            addProgress(progressInput);
-        } else {
-            updateProgress(progressInput);
+        try {
+            if (progressInput.id === null) {
+                await addProgress(progressInput).catch(e => { throw e; });
+            } else {
+                await updateProgress(progressInput).catch(e => { throw e; });
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            }
         }
     };
 
@@ -131,7 +145,6 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         if (!entryType) {
             throw new Error(`Could not find progress type for id: ${progressInput.progressTypeId}`);
         }
-
         const params = {
             method: 'POST',
             headers: {
@@ -141,10 +154,8 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         };
         const res = await fetch(URL_ADD_PROGRESS, params);
         if (!res.ok) {
-            // TODO: display error to user
-            console.error(`HTTP Error! Status: ${res.status}`);
+            throw new Error('Unable to add progress: network error');
         }
-        
         const data = await res.json();
         const entryId: number = Number(data.id);
         const entryDate: Date = progressInput.date
@@ -193,8 +204,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         };
         const res = await fetch(url, params);
         if (!res.ok) {
-            // TODO: display error to user
-            console.error(`HTTP Error! Status: ${res.status}`);
+            throw new Error(`Unable to update progress ${[progressInput.id]}. Network error.`);
         }
 
         const data = await res.json();
@@ -226,8 +236,10 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         };
         const res = await fetch(url, params);
         if (!res.ok) {
-            // TODO: display error to user
-            console.error(`HTTP Error! Status: ${res.status}`);
+            setError(`Unable to delete progress ${progressId}. Network error.`);
+            resetInputModel();
+
+            return;
         }
 
         setProgressEntries(progressEntries.filter(p => p.id !== progressId));
@@ -268,7 +280,6 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     };
 
     const handleDeleteProgressEntry = (entryId: number): void => {
-        // TODO: show confirmation modal, confirm delete through that.
         setInputModel({
             id: entryId,
             goalId: null,
@@ -318,14 +329,6 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     };
 
     const progressTable = (): JSX.Element => {
-        if (error !== null) {
-            return (
-                <p className="text-danger">
-                    {error}
-                </p>
-            );
-        }
-
         if (entryLoading) {
             return <Loader />;
         }
@@ -374,6 +377,17 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         );
     }
 
+    const errorAlert = (): JSX.Element => {
+        return (
+            <AlertDismissible
+                title={null}
+                message={error ?? ''}
+                type={'danger'}
+                handleClose={handleCloseErrorAlert}
+            ></AlertDismissible>
+        );
+    };
+
     const widgetHeader = (): JSX.Element => {
         if (goalLoading) {
             return (
@@ -397,6 +411,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
 
     return (
         <React.Fragment>
+            {error ? errorAlert() : null}
             <div className="goal-manager container border">
                 {widgetHeader()}
                 {progressTable()}

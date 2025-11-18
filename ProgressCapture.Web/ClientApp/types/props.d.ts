@@ -9,6 +9,12 @@ export interface WidgetProps {
     entityId: number | null; // The ID of the base entity for a component
 }
 
+export interface ProgressOptionsProps {
+    entryId: number;
+    handleEdit: (entityId: number) => void;
+    handleDelete: (entityId: number) => void;
+}
+
 export interface ProgressModalProps {
     show: boolean;
     inputModel: ProgressEntryInputModel;
@@ -19,12 +25,6 @@ export interface ProgressModalProps {
     handleSaveProgress: (progressInput: ProgressEntryInputModel) => void;
 }
 
-export interface ProgressOptionsProps {
-    entryId: number;
-    handleEdit: (entityId: number) => void;
-    handleDelete: (entityId: number) => void;
-}
-
 export interface ConfirmationModalProps {
     show: boolean;
     title: string;
@@ -33,5 +33,12 @@ export interface ConfirmationModalProps {
     confirmBtnText: string?;
     inputModel: ProgressEntryInputModel;
     handleConfirm: (progressId: number) => Promise<void>;
+    handleClose: () => void;
+}
+
+export interface AlertProps {
+    title: string | null;
+    message: string;
+    type: string | null;
     handleClose: () => void;
 }
