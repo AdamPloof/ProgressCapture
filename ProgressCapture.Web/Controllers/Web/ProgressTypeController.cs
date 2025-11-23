@@ -42,7 +42,8 @@ public class ProgressTypeController : Controller {
         await _context.ProgressTypes.AddAsync(new ProgressType() {
             Name = model.Name,
             Description = model.Description,
-            GoalId = model.GoalId,
+            GoalId = goalId,
+            Target = model.Target,
             UnitOfMeasureId = uom.Id
         });
         await _context.SaveChangesAsync();

@@ -10,15 +10,21 @@
             <div class="mb-3">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </div>
-            <div class="form-group flex-grow-1">
+            <div class="form-group flex-grow-1 mb-3">
                 <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group flex-grow-1">
+            <div class="form-group flex-grow-1 mb-3">
                 <label asp-for="Description"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group flex-grow-1 mb-3">
+                @* TODO: Use UOM name for target label *@
+                <label asp-for="Target">Hours</label>
+                <input asp-for="Target" class="form-control" />
+                <span asp-validation-for="Target" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="GoalId" />
             <div class="mb-3">

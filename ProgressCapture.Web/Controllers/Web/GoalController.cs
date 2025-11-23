@@ -62,4 +62,44 @@ public class GoalController : Controller {
 
         return RedirectToRoute("Home");
     }
+
+    /// <summary>
+    /// Besides editing the core fields of a Goal, this also provides a way to modify
+    /// progress types associated with a Goal.
+    /// </summary>
+    /// <param name="goalId"></param>
+    /// <returns></returns>
+    [HttpGet("edit/{goalId}", Name = "EditGoal")]
+    public async Task<IActionResult> Edit(int goalId) {
+        Goal? goal = await _context.Goals.FindAsync(goalId);
+        if (goal == null) {
+            return NotFound();
+        }
+
+        IEnumerable<ProgressType> progressTypes = _context.ProgressTypes.Where(p => p.GoalId == goalId);
+        GoalViewModel model = new GoalViewModel() {
+            Name = goal.Name,
+            Description = goal.Description,
+        };
+
+        foreach (ProgressType p in progressTypes) {
+            model.ProgressTypes.Add(new ProgressTypeViewModel() {
+                Name = p.Name,
+                Description = p.Description,
+                Target = p.Target,
+                GoalId = goalId
+            });
+        }
+
+        return View(model);
+    }
+
+    [HttpPost("edit/{goalId}", Name = "EditGoal")]
+    public IActionResult Edit(GoalViewModel model) {
+        if (!ModelState.IsValid) {
+            return View(model);
+        }
+
+        return RedirectToRoute("Home");
+    }
 }

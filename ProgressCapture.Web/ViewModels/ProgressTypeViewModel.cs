@@ -11,5 +11,8 @@ public class ProgressTypeViewModel {
     public string? Description { get; set; }
 
     [Required]
+    public int Target { get; set; }
+
+    [Required]
     public int GoalId { get; set; }
 }

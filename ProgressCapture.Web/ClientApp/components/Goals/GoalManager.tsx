@@ -1,4 +1,5 @@
 import React, { JSX, useState, useEffect } from 'react';
+import SummarySidebar from './SummarySidebar';
 import ProgressModal from './ProgressModal';
 import ProgressOptions from './ProgressOptions';
 import Loader from '../Common/Loader';
@@ -412,9 +413,12 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     return (
         <React.Fragment>
             {error ? errorAlert() : null}
-            <div className="goal-manager container border">
-                {widgetHeader()}
-                {progressTable()}
+            <div className="content-wrapper d-flex flex-row justify-content-between">
+                <div className="goal-manager container border">
+                    {widgetHeader()}
+                    {progressTable()}
+                </div>
+                <SummarySidebar></SummarySidebar>
             </div>
             <ProgressModal
                 show={showModal}

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace ProgressCapture.Web.ViewModels;
 
@@ -11,4 +12,6 @@ public class GoalViewModel {
 
     [StringLength(1024, ErrorMessage = "Maximum length is {1}")]
     public string? Description { get; set; }
+
+    public List<ProgressTypeViewModel> ProgressTypes { get; set; } = [];
 }
