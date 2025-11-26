@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace ProgressCapture.Web.ViewModels;
 
 public class ProgressTypeViewModel {
+    public int? Id { get; set; }
+
     [Required]
     [StringLength(255, ErrorMessage = "Maximum length is {1}")]
     public string Name { get; set; } = "";

@@ -49,6 +49,7 @@ public class GoalController : Controller {
     }
 
     [HttpPost("add", Name = "AddGoal")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(GoalViewModel model) {
         if (!ModelState.IsValid) {
             return View(model);
@@ -78,12 +79,14 @@ public class GoalController : Controller {
 
         IEnumerable<ProgressType> progressTypes = _context.ProgressTypes.Where(p => p.GoalId == goalId);
         GoalViewModel model = new GoalViewModel() {
+            Id = goalId,
             Name = goal.Name,
             Description = goal.Description,
         };
 
         foreach (ProgressType p in progressTypes) {
             model.ProgressTypes.Add(new ProgressTypeViewModel() {
+                Id = p.Id,
                 Name = p.Name,
                 Description = p.Description,
                 Target = p.Target,
@@ -95,11 +98,48 @@ public class GoalController : Controller {
     }
 
     [HttpPost("edit/{goalId}", Name = "EditGoal")]
-    public IActionResult Edit(GoalViewModel model) {
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(GoalViewModel model) {
         if (!ModelState.IsValid) {
             return View(model);
         }
 
-        return RedirectToRoute("Home");
+        Goal? goal = await _context.Goals.FindAsync(model.Id);
+        if (goal == null) {
+            return NotFound($"Could not find goal for ID: {model.Id}");
+        }
+
+        goal.Name = model.Name;
+        goal.Description = model.Description;
+        foreach (ProgressTypeViewModel ptModel in model.ProgressTypes) {
+            if (ptModel.Id != null) {
+                // 
+                ProgressType? progressType = await _context.ProgressTypes.FindAsync(ptModel.Id);
+                if (progressType == null) {
+                    return NotFound($"Could not find progress type for ID: {ptModel.Id}");
+                }
+
+                progressType.Name = ptModel.Name;
+                progressType.Description = ptModel.Description;
+                progressType.Target = ptModel.Target;
+            } else {
+                UnitOfMeasure uom = await _context.UnitOfMeasures
+                    .Where(u => u.Name == "Hours")
+                    .FirstAsync();
+                ProgressType progressType = new ProgressType() {
+                    Name = ptModel.Name,
+                    Description = ptModel.Description,
+                    Target = ptModel.Target,
+                    GoalId = goal.Id,
+                    UnitOfMeasureId = uom.Id // default to hours for now
+                };
+                goal.ProgressTypes.Add(progressType);
+            }
+        }
+
+        _context.Update(goal);
+        await _context.SaveChangesAsync();
+
+        return RedirectToRoute("ViewGoal", new {goalId = model.Id});
     }
 }

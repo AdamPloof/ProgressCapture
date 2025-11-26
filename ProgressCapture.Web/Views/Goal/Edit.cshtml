@@ -1,30 +1,44 @@
 @using ProgressCapture.Web.ViewModels
-@using ProgressCapture.Web.Models;
+@using ProgressCapture.Web.Models
 
 @model GoalViewModel
 
 <div class="container">
-    <h2>Edit Goal</h2>
-    <form asp.action="UploadToLibrary" method="post" enctype="multipart/form-data">
-        <div class="form-content d-flex flex-column">
-            <div class="mb-3">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            </div>
-            <div class="form-group flex-grow-1 mb-3">
-                <label asp-for="Name"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group flex-grow-1 mb-3">
-                <label asp-for="Description"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </div>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h2 class="m-0">Edit Goal</h2>
         </div>
-    </form>
+        <div class="card-body">
+            <form asp.action="UploadToLibrary" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-content d-flex flex-column">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group flex-grow-1 mb-3">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group flex-grow-1 mb-3">
+                        <label asp-for="Description"></label>
+                        <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <hr>
+                    <section>
+                        <h3>Progress Types</h3>
+                        <div id="progress-types-list" class="d-flex row-gap-4 flex-column">
+                            @Html.EditorFor(model => model.ProgressTypes)
+                        </div>
+                        <button
+                            id="add-progress-type-btn"
+                            class="btn btn-outline-info mt-3"
+                        >Add Progress Type</button>
+                    </section>
+                    <div class="form-group mt-3 border-top pt-3">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

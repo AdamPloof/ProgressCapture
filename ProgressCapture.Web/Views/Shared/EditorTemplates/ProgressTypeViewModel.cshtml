@@ -1,0 +1,25 @@
+@using ProgressCapture.Web.ViewModels
+
+@model ProgressTypeViewModel
+
+<div class="d-flex flex-column border p-3 rounded progress-type-form-wrapper">
+    <input type="hidden" asp-for="Id" />
+    <div class="d-flex flex-row column-gap-4">
+        <div class="form-group flex-grow-1 mb-3">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group flex-grow-1 mb-3">
+            <label asp-for="Description"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group mb-3">
+        @* TODO: Use UOM name for target label *@
+        <label asp-for="Target">Hours</label>
+        <input asp-for="Target" class="form-control" />
+        <span asp-validation-for="Target" class="text-danger"></span>
+    </div>
+</div>
