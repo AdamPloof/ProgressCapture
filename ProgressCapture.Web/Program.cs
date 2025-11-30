@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.StaticFiles;
 
 using ProgressCapture.Web.Data;
+using ProgressCapture.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<ProgressCaptureDbContext>(opts => {
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IUserGoalLoader, UserGoalLoader>();
 
 var app = builder.Build();
 
