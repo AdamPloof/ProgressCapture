@@ -1,4 +1,4 @@
-import React, { JSX, useState, useEffect } from 'react';
+import React, { JSX, useState, useEffect, useMemo } from 'react';
 import SummarySidebar from './SummarySidebar';
 import ProgressModal from './ProgressModal';
 import ProgressOptions from './ProgressOptions';
@@ -6,12 +6,17 @@ import Loader from '../Common/Loader';
 import ConfirmationModal from '../Common/ConfirmationModal';
 import AlertDismissible from '../Common/AlertDismissable';
 import { WidgetProps } from 'types/props';
-import { fetchData, replaceUrlPlaceholders } from '../../includes/utils';
+import {
+    fetchData,
+    replaceUrlPlaceholders,
+    calculateProgressStats,
+} from '../../includes/utils';
 import {
     Goal,
     ProgressEntry,
     ProgressType,
-    ProgressEntryInputModel
+    ProgressEntryInputModel,
+    ProgressStat
 } from '../../types/entities';
 import {
     goalTransformer,
@@ -56,6 +61,11 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const [entryLoading, setEntryLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
+
+    const stats = useMemo(
+        () => calculateProgressStats(progressTypes, progressEntries),
+        [progressTypes, progressEntries]
+    );
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
@@ -418,7 +428,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
                     {widgetHeader()}
                     {progressTable()}
                 </div>
-                <SummarySidebar></SummarySidebar>
+                <SummarySidebar stats={stats}></SummarySidebar>
             </div>
             <ProgressModal
                 show={showModal}

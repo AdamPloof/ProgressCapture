@@ -2,7 +2,8 @@ import React, { JSX } from 'react';
 import {
     ProgressEntry,
     ProgressEntryInputModel,
-    ProgressType
+    ProgressType,
+    ProgressStat
 } from "./entities";
 
 export interface WidgetProps {
@@ -41,4 +42,8 @@ export interface AlertProps {
     message: string;
     type: string | null;
     handleClose: () => void;
+}
+
+export interface GoalSummaryProps {
+    stats: ProgressStat[];
 }

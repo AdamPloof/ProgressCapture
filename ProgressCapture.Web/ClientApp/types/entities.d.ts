@@ -39,3 +39,11 @@ export interface ProgressEntryInputModel {
     notes: string | null;
     progressTypeId: number | null;
 }
+
+export interface ProgressStat {
+    typeId: number;
+    name: string;
+    current: number;
+    total: number;
+    unitOfMeasure: string;
+}

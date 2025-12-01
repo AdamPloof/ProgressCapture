@@ -1,4 +1,9 @@
 import { Transformer } from "./transformers";
+import {
+    ProgressStat,
+    ProgressEntry,
+    ProgressType
+} from "types/entities";
 
 /**
  * Simple wrapper around fetch() for retreiving json data
@@ -127,4 +132,37 @@ export function titleCase(str: string): string {
     const words = str.toLowerCase().split(' ').map(capitalizeWord);
 
     return words.join(' ');
+}
+
+export function calculateProgressStats(
+    types: ProgressType[],
+    entries: ProgressEntry[]
+): ProgressStat[] {
+    if (types.length === 0) {
+        return [];
+    }
+
+    const stats: Map<number, ProgressStat> = new Map();
+    for (const t of types) {
+        stats.set(t.id, {
+            typeId: t.id,
+            name: t.name,
+            current: 0.0,
+            total: t.target,
+            unitOfMeasure: t.unitOfMeasure.name
+        });
+    }
+
+    for (const e of entries) {
+        const stat = stats.get(e.progressType.id);
+        if (!stat) {
+            let errMsg = `Unkown progress type for entry: ${e.id}. `;
+            errMsg += 'Could not find a progress type for the current goal.';
+            throw new Error(errMsg);
+        }
+
+        stat.current += e.amount;
+    }
+
+    return Array.from(stats.values());
 }
