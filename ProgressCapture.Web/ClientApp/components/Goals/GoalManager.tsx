@@ -428,7 +428,10 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
                     {widgetHeader()}
                     {progressTable()}
                 </div>
-                <SummarySidebar stats={stats}></SummarySidebar>
+                <SummarySidebar
+                    goal={goal}
+                    stats={stats}
+                ></SummarySidebar>
             </div>
             <ProgressModal
                 show={showModal}

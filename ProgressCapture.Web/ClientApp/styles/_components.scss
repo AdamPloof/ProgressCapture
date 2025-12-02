@@ -80,6 +80,24 @@
 
 .summary-sidebar {
     min-width: 340px;
+    height: fit-content;
+
+    .sidebar-settings {
+        a img:hover {
+            // animation: .5s ease-in-out;
+            filter: brightness(110%);
+            transform: rotate(65deg);
+        }
+
+        a.disabled {
+            cursor: pointer;
+            pointer-events: none;
+
+            img {
+                filter: brightness(50%);
+            }
+        }
+    }
 }
 
 .progress-type-form-wrapper {

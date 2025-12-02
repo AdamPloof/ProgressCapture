@@ -45,5 +45,6 @@ export interface AlertProps {
 }
 
 export interface GoalSummaryProps {
+    goal: Goal | null;
     stats: ProgressStat[];
 }
