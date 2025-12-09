@@ -1,0 +1,28 @@
+@using ProgressCapture.Web.ViewModels
+@using ProgressCapture.Web.Models
+
+@model ProgressUploadViewModel
+
+<div class="container">
+    <div class="card mt-4">
+        <div class="card-header">
+            <h2 class="m-0">Edit Goal</h2>
+        </div>
+        <div class="card-body">
+            <form asp.action="UploadToLibrary" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="GoalId" />
+                <div class="form-content d-flex flex-column">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    @* <div class="form-group flex-grow-1 mb-3">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div> *@
+                    <div class="form-group mt-3 border-top pt-3">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
 using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
 using ProgressCapture.Web.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace ProgressCapture.Web.Controllers;
 
