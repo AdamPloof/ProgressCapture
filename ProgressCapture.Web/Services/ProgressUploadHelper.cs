@@ -6,12 +6,13 @@ using Microsoft.Extensions.Options;
 
 using CsvHelper;
 
+using ProgressCapture.Web.Models;
 using ProgressCapture.Web.Configuration;
 using ProgressCapture.Web.Exceptions;
 
 namespace ProgressCapture.Web.Services;
 
-public class ProgressUploadHelper {
+public class ProgressUploadHelper : IUploadHelper {
     private int _maxFileSizeBytes;
     private readonly ILogger<ProgressUploadHelper> _logger;
     private List<string> _errors;
@@ -57,23 +58,5 @@ public class ProgressUploadHelper {
 
     private bool IsValid() {
         return _errors.Count == 0;
-    }
-
-    private class ProgressCsvRow {
-        public required string Goal { get; set; }
-        public required string Type { get; set; }
-        public required DateTime Date { get; set; }
-        public required double Amount { get; set; }
-        public string? Notes { get; set; }
-
-        public override string ToString() {
-            return $"""
-                Goal: {Goal}
-                Type: {Type}
-                Date: {Date}
-                Amount: {Amount}
-                Notes: {Notes}
-            """;
-        }
     }
 }

@@ -56,6 +56,7 @@ try {
     // Add services to the container.
     builder.Services.AddControllersWithViews();
     builder.Services.AddScoped<IUserGoalLoader, UserGoalLoader>();
+    builder.Services.AddScoped<IUploadHelper, ProgressUploadHelper>();
 
     var app = builder.Build();
 
