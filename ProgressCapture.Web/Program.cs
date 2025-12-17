@@ -77,6 +77,7 @@ try {
     app.UseRouting();
 
     app.UseAuthorization();
+    app.UseSerilogRequestLogging();
 
     app.MapStaticAssets();
 
