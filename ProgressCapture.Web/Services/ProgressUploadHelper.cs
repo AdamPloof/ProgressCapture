@@ -38,7 +38,7 @@ public class ProgressUploadHelper : IUploadHelper {
         _typeCache = [];
     }
 
-    public async Task ReadProgress(IFormFile file) {
+    public async Task<List<ProgressEntry>> ReadProgress(IFormFile file) {
         _errors.Clear();
         ValidateFile(file);
         if (!IsValid()) {
@@ -50,6 +50,7 @@ public class ProgressUploadHelper : IUploadHelper {
             PrepareHeaderForMatch = (args) => args.Header.ToLower()
         };
 
+        List<ProgressEntry> entries = [];
         using (var reader = new StreamReader(file.OpenReadStream()))
         using (var csv = new CsvReader(reader, config)) {
             var progressRows = csv.GetRecords<ProgressCsvRow>();
@@ -59,16 +60,17 @@ public class ProgressUploadHelper : IUploadHelper {
                 // TODO: Handle integer IDs for goals/types
                 Goal goal = await GetGoalByName(progress.Goal);
                 ProgressType type = await GetProgressTypeByName(goal.Id, progress.Type);
-                await _progressRepo.AddProgress(new ProgressEntry() {
+                entries.Add(new ProgressEntry() {
                     Date = progress.Date,
                     Amount = progress.Amount,
                     Notes = progress.Notes,
-                    ProgressTypeId = type.Id
+                    ProgressTypeId = type.Id,
+                    ProgressType = type
                 });
             }
-
-            await _progressRepo.SaveChanges();
         }
+
+        return entries;
     }
 
     private async Task<Goal> GetGoalByName(string goalName) {
