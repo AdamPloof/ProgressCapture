@@ -37,4 +37,15 @@ public class ProgressController : Controller {
 
         return View(model);
     }
+
+    [HttpGet("download/{goalId}")]
+    public async Task<IActionResult> Download(int goalId) {
+        IEnumerable<ProgressEntry> entries = _context.ProgressEntries
+            .Where(e => e.ProgressType.GoalId == goalId);
+
+        byte[] contents = await DownloadHelper.ExportProgress(entries);
+        string filename = $"{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_progress.csv";
+
+        return File(contents, "text/csv", filename);
+    }
 }
