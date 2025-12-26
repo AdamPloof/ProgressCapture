@@ -1,3 +1,5 @@
+using CsvHelper.Configuration;
+
 namespace ProgressCapture.Web.Models;
 
 /// <summary>
@@ -18,5 +20,15 @@ public class ProgressCsvRow {
             Amount: {Amount}
             Notes: {Notes}
         """;
+    }
+
+    public class ProgressCsvMap : ClassMap<ProgressCsvRow> {
+        public ProgressCsvMap() {
+            Map(row => row.Goal);
+            Map(row => row.Type);
+            Map(row => row.Date).TypeConverterOption.Format("MM/dd/yyyy");
+            Map(row => row.Amount);
+            Map(row => row.Notes);
+        }
     }
 }

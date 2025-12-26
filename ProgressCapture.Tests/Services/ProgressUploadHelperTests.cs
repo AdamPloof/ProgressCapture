@@ -17,7 +17,7 @@ namespace ProgressCapture.Tests.Services;
 
 public class ProgressUploadHelperTests {
     [Fact]
-    public async Task FileIsEmptyThrows() {
+    public void FileIsEmptyThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -28,13 +28,13 @@ public class ProgressUploadHelperTests {
         const string content = "";
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task FileWithZeroRowsReturnsEmptyList() {
+    public void FileWithZeroRowsReturnsEmptyList() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -47,13 +47,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        List<ProgressEntry> entries = await uploadHelper.ReadProgress(file);
+        List<ProgressEntry> entries = uploadHelper.ReadProgress(file);
 
         Assert.Empty(entries);
     }
 
     [Fact]
-    public async Task UnsupportedFileThrows() {
+    public void UnsupportedFileThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -84,13 +84,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content, "test.json", "file", "application/json");
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task UnknownGoalNameThrows() {
+    public void UnknownGoalNameThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -121,13 +121,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task UnkownProgressTypeThrows() {
+    public void UnkownProgressTypeThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -158,13 +158,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task MultipleGoalsSameNameThrows() {
+    public void MultipleGoalsSameNameThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -199,13 +199,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task MultipleProgressTypesSameNameThrows() {
+    public void MultipleProgressTypesSameNameThrows() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -243,13 +243,13 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        var exception = await Assert.ThrowsAsync<InvalidUploadException>(
+        var exception = Assert.Throws<InvalidUploadException>(
             () => uploadHelper.ReadProgress(file)
         );
     }
 
     [Fact]
-    public async Task SingleProgressEntrySucceeds() {
+    public void SingleProgressEntrySucceeds() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -288,7 +288,7 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        List<ProgressEntry> entries = await uploadHelper.ReadProgress(file);
+        List<ProgressEntry> entries = uploadHelper.ReadProgress(file);
         Assert.Single(entries);
 
         ProgressEntry entry = entries[0];
@@ -306,7 +306,7 @@ public class ProgressUploadHelperTests {
     }
 
     [Fact]
-    public async Task MultipleProgressEntriesSucceeds() {
+    public void MultipleProgressEntriesSucceeds() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -346,7 +346,7 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        List<ProgressEntry> entries = await uploadHelper.ReadProgress(file);
+        List<ProgressEntry> entries = uploadHelper.ReadProgress(file);
         Assert.Equal(2, entries.Count);
 
         ProgressEntry entry1 = entries[0];
@@ -377,7 +377,7 @@ public class ProgressUploadHelperTests {
     }
 
     [Fact]
-    public async Task ParseCaseInsensitiveHeadersSucceeds() {
+    public void ParseCaseInsensitiveHeadersSucceeds() {
         IOptions<FileUploadOptions> opts = Options.Create(new FileUploadOptions() {
             MaxFileSizeBytes = 2_000_000
         });
@@ -417,7 +417,7 @@ public class ProgressUploadHelperTests {
         """;
         IFormFile file = FormFileFactory.CreateCsv(content);
 
-        List<ProgressEntry> entries = await uploadHelper.ReadProgress(file);
+        List<ProgressEntry> entries = uploadHelper.ReadProgress(file);
         Assert.Equal(2, entries.Count);
 
         ProgressEntry entry1 = entries[0];

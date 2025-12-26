@@ -27,4 +27,26 @@ public static class DownloadHelper {
 
         return ms.ToArray();
     }
+
+    /// <summary>
+    /// Get a CSV with the headers for a progress upload file
+    /// </summary>
+    /// <returns></returns>
+    public static async Task<byte[]> ProgressUploadTemplate() {
+        using var ms = new MemoryStream();
+        using (var writer = new StreamWriter(ms))
+        using (var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture))) {
+            csv.Context.RegisterClassMap<ProgressCsvRow.ProgressCsvMap>();
+            List<ProgressCsvRow> rows = [new ProgressCsvRow() {
+                Goal = "goal...",
+                Type = "type...",
+                Date = DateTime.UnixEpoch,
+                Amount = 1,
+                Notes = "notes..."
+            }];
+            await csv.WriteRecordsAsync(rows);
+        }
+
+        return ms.ToArray();
+    }
 }

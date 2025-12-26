@@ -38,7 +38,7 @@ public class ProgressUploadHelper : IUploadHelper {
         _typeCache = [];
     }
 
-    public async Task<List<ProgressEntry>> ReadProgress(IFormFile file) {
+    public List<ProgressEntry> ReadProgress(IFormFile file) {
         _errors.Clear();
         ValidateFile(file);
         if (!IsValid()) {
@@ -58,8 +58,8 @@ public class ProgressUploadHelper : IUploadHelper {
                 _logger.LogDebug(progress.ToString());
 
                 // TODO: Handle integer IDs for goals/types
-                Goal goal = await GetGoalByName(progress.Goal);
-                ProgressType type = await GetProgressTypeByName(goal.Id, progress.Type);
+                Goal goal = GetGoalByName(progress.Goal);
+                ProgressType type = GetProgressTypeByName(goal.Id, progress.Type);
                 entries.Add(new ProgressEntry() {
                     Date = progress.Date,
                     Amount = progress.Amount,
@@ -73,7 +73,7 @@ public class ProgressUploadHelper : IUploadHelper {
         return entries;
     }
 
-    private async Task<Goal> GetGoalByName(string goalName) {
+    private Goal GetGoalByName(string goalName) {
         List<Goal> goals = _progressRepo.GetGoalsByName(goalName).ToList();
         if (goals.Count > 1 || goals.Count == 0) {
             throw new InvalidUploadException($"Expected one Goal for name {goalName}, got {goals.Count}");
@@ -82,7 +82,7 @@ public class ProgressUploadHelper : IUploadHelper {
         return goals[0];
     }
     
-    private async Task<ProgressType> GetProgressTypeByName(int goalId, string typeName) {
+    private ProgressType GetProgressTypeByName(int goalId, string typeName) {
         List<ProgressType> types = _progressRepo.GetProgressTypesByName(goalId, typeName).ToList();
         if (types.Count > 1 || types.Count == 0) {
             throw new InvalidUploadException(

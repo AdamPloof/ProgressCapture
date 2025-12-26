@@ -14,6 +14,11 @@
         @await Html.PartialAsync(partialViewName: "_Nav")
     </header>
     <div class="container-fluid">
+        @if (TempData["FlashMessage"] is FlashMessage flash) {
+            <div class="alert alert-@flash.Type">
+                @flash.Message
+            </div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

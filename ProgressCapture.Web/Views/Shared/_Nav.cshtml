@@ -8,9 +8,12 @@
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" asp-route="Home">Home</a>
                 </li>
                 @await Component.InvokeAsync("NavGoals")
+                <li class="nav-item">
+                    <a class="nav-link" asp-route="upload-progress">Upload</a>
+                </li>
             </ul>
         </div>
     </div>
