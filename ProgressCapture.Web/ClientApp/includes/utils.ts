@@ -166,3 +166,11 @@ export function calculateProgressStats(
 
     return Array.from(stats.values());
 }
+
+export function roundTo(num: number, places: number = 2) {
+    if (!Number.isInteger(places)) {
+        return num;
+    }
+
+    return Math.round(num * (10 ** places)) / (10 ** places);
+}

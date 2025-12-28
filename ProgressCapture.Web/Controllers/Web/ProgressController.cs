@@ -39,11 +39,12 @@ public class ProgressController : Controller {
                 await _context.ProgressEntries.AddAsync(entry);
             }
             await _context.SaveChangesAsync();
-            // FlashMessage flash = new() {
-            //     Type = "success",
-            //     Message = $"Added {entries.Count} progress entries"
-            // };
-            // TempData.AddFlash(flash);
+            FlashMessage flash = new() {
+                Title = "Import Complete",
+                Type = "success",
+                Message = $"Added {entries.Count} progress entries"
+            };
+            TempData.AddFlash(flash);
 
             return RedirectToRoute("Home");
         } catch (InvalidUploadException e) {

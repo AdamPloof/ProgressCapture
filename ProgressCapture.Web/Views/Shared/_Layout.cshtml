@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using ProgressCapture.Web.Extensions
+@using ProgressCapture.Web.ViewModels;
+
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8" />
@@ -14,8 +17,14 @@
         @await Html.PartialAsync(partialViewName: "_Nav")
     </header>
     <div class="container-fluid">
-        @if (TempData["FlashMessage"] is FlashMessage flash) {
+        @{ FlashMessage? flash =  TempData.Get<FlashMessage>("FlashMessage"); }
+        @if (flash is not null) {
             <div class="alert alert-@flash.Type">
+                @if (flash.Title is not null) {
+                    <div class="alert-heading">
+                        <h4>@flash.Title</h4>
+                    </div>
+                }
                 @flash.Message
             </div>
         }

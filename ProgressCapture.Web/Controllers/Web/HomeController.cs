@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+
 using ProgressCapture.Web.ViewModels;
 
 namespace ProgressCapture.Web.Controllers.Web;

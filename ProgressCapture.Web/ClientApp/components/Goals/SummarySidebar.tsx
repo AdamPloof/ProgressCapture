@@ -3,7 +3,7 @@ import { ProgressStat } from 'types/entities';
 import { GoalSummaryProps } from 'types/props';
 import { ProgressBar } from 'react-bootstrap';
 import { URL_IMAGE_ROOT, URL_EDIT_GOAL } from '../../includes/paths';
-import { replaceUrlPlaceholders } from '../../includes/utils';
+import { replaceUrlPlaceholders, roundTo } from '../../includes/utils';
 
 interface StatTotal {
     total: number;
@@ -20,7 +20,7 @@ export default function SummarySidebar(props: GoalSummaryProps): JSX.Element {
                     <div className="list-left w-50">{stat.name}</div>
                     <div className="list-center d-flex flex-grow-1 justify-content-start w-30">
                         <small className="text-muted">
-                            {`${stat.current}/${stat.total} ${stat.unitOfMeasure.toLocaleLowerCase()}`} 
+                            {`${roundTo(stat.current, 1)}/${stat.total} ${stat.unitOfMeasure.toLocaleLowerCase()}`} 
                         </small>
                     </div>
                     <div className="list-right d-flex flex-grow-1 justify-content-end w-20">{percentComplete}%</div>
