@@ -31,6 +31,14 @@ export interface ProgressEntry {
     progressType: ProgressType;
 }
 
+export interface ProgressEntryTableRow {
+    id: number;
+    date: Date;
+    amount: number;
+    notes: string | null;
+    type: string;
+}
+
 export interface ProgressEntryInputModel {
     id: number | null;
     goalId: number | null;

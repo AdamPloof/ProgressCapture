@@ -1,7 +1,7 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
 import SummarySidebar from './SummarySidebar';
+import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import ProgressModal from './ProgressModal';
-import ProgressOptions from './ProgressOptions';
 import Loader from '../Common/Loader';
 import ConfirmationModal from '../Common/ConfirmationModal';
 import AlertDismissible from '../Common/AlertDismissable';
@@ -16,7 +16,7 @@ import {
     ProgressEntry,
     ProgressType,
     ProgressEntryInputModel,
-    ProgressStat
+    ProgressEntryTableRow
 } from '../../types/entities';
 import {
     goalTransformer,
@@ -273,14 +273,14 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         handleShowModal();
     };
 
-    const handleEditProgressEntry = (entryId: number): void => {
-        const selectedEntry = progressEntries.find(e => e.id === entryId);
+    const handleEditProgressEntry = (row: ProgressEntryTableRow): void => {
+        const selectedEntry = progressEntries.find(e => e.id === row.id);
         if (!selectedEntry) {
-            throw new Error(`Unable to edit entry. Could not find entry for id ${entryId}.`);
+            throw new Error(`Unable to edit entry. Could not find entry for id ${row.id}.`);
         }
 
         setInputModel({
-            id: entryId,
+            id: selectedEntry.id,
             goalId: selectedEntry.progressType.goalId,
             date: selectedEntry.date,
             amount: selectedEntry.amount,
@@ -290,18 +290,18 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         handleShowModal();
     };
 
-    const handleDeleteProgressEntry = (entryId: number): void => {
+    const handleDeleteProgressEntry = (row: ProgressEntryTableRow): void => {
         setInputModel({
-            id: entryId,
+            id: row.id,
             goalId: null,
             date: null,
             amount: 0,
             notes: null,
             progressTypeId: null
         });
-        const targetEntry = progressEntries.find(p => p.id === entryId);
+        const targetEntry = progressEntries.find(p => p.id === row.id);
         if (!targetEntry) {
-            throw new Error(`Could not delete progress entry. No progress found for ID: ${entryId}`);
+            throw new Error(`Could not delete progress entry. No progress found for ID: ${row.id}`);
         }
 
         const msg = (
@@ -345,40 +345,26 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         }
 
         return (
-            <table className={progressEntries.length > 1 ? 'table table-striped' : 'table'}>
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Hours</th>
-                        <th scope="col">Notes</th>
-                        <th scope="col">Options</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {progressEntries.length > 0 ? progressEntries.map(e => tableRow(e)): noEntriesRow()}
-                </tbody>
-            </table>
+            <PaginatedTable<ProgressEntryTableRow>
+                tableClass='table table-striped'
+                fields={['id', 'date', 'type', 'amount', 'notes']}
+                values={progressEntries.map((e): ProgressEntryTableRow => {
+                    return {
+                        id: e.id,
+                        date: e.date,
+                        type: e.progressType.name,
+                        amount: e.amount,
+                        notes: e.notes
+                    };
+                })}
+                sortBy={new Map()}
+                converters={new Map()}
+                handleView={null}
+                handleEdit={handleEditProgressEntry}
+                handleDelete={handleDeleteProgressEntry}
+            ></PaginatedTable>
         );
     };
-
-    const tableRow = (entry: ProgressEntry): JSX.Element => {
-        return(
-            <tr key={`tr-${entry.id}`}>
-                <td>{entry.date.toLocaleDateString('en-US', DATE_FORMAT_OPS)}</td>
-                <td>{entry.progressType.name}</td>
-                <td>{entry.amount}</td>
-                <td>{entry.notes}</td>
-                <td>
-                    <ProgressOptions
-                        entryId={entry.id}
-                        handleEdit={handleEditProgressEntry}
-                        handleDelete={handleDeleteProgressEntry}
-                    ></ProgressOptions>
-                </td>
-            </tr>
-        );
-    }
 
     const noEntriesRow = (): JSX.Element => {
         return (
