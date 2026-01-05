@@ -1,6 +1,7 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
 import SummarySidebar from './SummarySidebar';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
+import TableRowSorter from '../PaginatedTable/TableRowSorter';
 import ProgressModal from './ProgressModal';
 import Loader from '../Common/Loader';
 import ConfirmationModal from '../Common/ConfirmationModal';
@@ -344,6 +345,8 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             return <Loader />;
         }
 
+        const rowSorter = new TableRowSorter();
+
         return (
             <PaginatedTable<ProgressEntryTableRow>
                 tableClass='table table-striped'
@@ -357,8 +360,8 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
                         notes: e.notes
                     };
                 })}
-                sortBy={new Map()}
-                converters={new Map()}
+                rowSorter={rowSorter}
+                defaultSortField={'date'}
                 handleView={null}
                 handleEdit={handleEditProgressEntry}
                 handleDelete={handleDeleteProgressEntry}

@@ -125,11 +125,20 @@ export function titleCase(str: string): string {
         return str;
     }
 
+    const ALL_CAPS_WORDS = ['id'];
+
     const capitalizeWord = (word: string): string => {
+        if (ALL_CAPS_WORDS.includes(word)) {
+            return word.toUpperCase();
+        }
+
         return word.charAt(0).toUpperCase() + word.substring(1);
     }
 
-    const words = str.toLowerCase().split(' ').map(capitalizeWord);
+    const words = str
+        .toLowerCase()
+        .split(' ')
+        .map(capitalizeWord);
 
     return words.join(' ');
 }

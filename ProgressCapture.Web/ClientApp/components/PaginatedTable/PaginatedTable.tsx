@@ -1,6 +1,6 @@
-import React, { JSX } from 'react';
+import React, { JSX, useState, useMemo } from 'react';
 import TableRowOptions from './TableRowOptions';
-import { PaginatedTableProps } from 'types/props';
+import { PaginatedTableProps, SortOrder } from 'types/props';
 import { titleCase } from '../../includes/utils';
 
 /**
@@ -18,6 +18,37 @@ export default function PaginatedTable<T extends object>(
         year: 'numeric'
     };
 
+    const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+    const [sortField, setSortField] = useState<keyof T | null>(() => {
+        if (props.defaultSortField !== null) {
+            return props.defaultSortField;
+        }
+
+        return props.fields.length > 0 ? props.fields[0] : null;
+    });
+
+    const sortValues = (): T[] => {
+        if (sortField === null) {
+            return [...props.values];
+        }
+
+        return props.rowSorter.sortValues(props.values, sortField, sortOrder);
+    };
+
+    const handleSort = (field: keyof T) => {
+        if (field === sortField) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortOrder('asc');
+        }
+    };
+
+    const sortedValues: T[] = useMemo(
+        () => sortValues(),
+        [sortField, sortOrder]
+    );
+
     const tableHeaders = (): JSX.Element => {
         const hasOptions = props.handleView !== null
             || props.handleEdit !== null
@@ -26,8 +57,25 @@ export default function PaginatedTable<T extends object>(
         return (
             <tr>
                 {props.fields.map(f => {
+                    const headerClass = f === sortField ? `col-sort-${sortOrder}` : '';
+
                     return (
-                        <th key={`th_${String(f)}`} scope="col">{titleCase(String(f))}</th>
+                        <th
+                            key={`th_${String(f)}`}
+                            scope="col"
+                            className={headerClass}
+                        >
+                            <a
+                                href="#"
+                                className="col-sort-link"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSort(f);
+                                }}
+                            >
+                                {titleCase(String(f))}
+                            </a>
+                        </th>
                     );
                 })}
                 {hasOptions ? (<th scope="col">Options</th>) : null}
@@ -41,7 +89,7 @@ export default function PaginatedTable<T extends object>(
             || props.handleDelete !== null;
 
         return (
-            <tr>
+            <tr key={`tr_${idx}`}>
                 {props.fields.map(f => {
                     return (
                         // TODO: use custom converters if provided
@@ -83,7 +131,7 @@ export default function PaginatedTable<T extends object>(
                 {tableHeaders()}
             </thead>
             <tbody>
-                {props.values.map(tableRow)}
+                {sortedValues.map(tableRow)}
             </tbody>
         </table>
     );

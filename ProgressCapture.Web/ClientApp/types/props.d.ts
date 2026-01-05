@@ -48,22 +48,23 @@ export interface PaginatedTableProps<T extends object> {
     tableClass?: string;
     fields: (keyof T)[];
     values: T[];
-    sortBy: Map<keyof T, TableSortFunc<T>>;
-    converters: Map<keyof T, TableValueConverterFunc<T>>;
+    rowSorter: IRowSorter<T>;
+    defaultSortField: keyof T | null;
     handleView: HandleViewFunc<T> | null;
     handleEdit: HandleEditFunc<T> | null;
     handleDelete: HandleDeleteFunc<T> | null;
 }
 
-/**
- * User defined function for sorting the rows of a table
- */
-export type TableSortFunc<T> = (values: T[]) => T[];
+export type SortOrder = 'asc' | 'desc';
+
+export interface IRowSorter<T> {
+    sortValues(values: T[], field: keyof T, order: SortOrder);
+}
 
 /**
  * User defined function for converting the values of a table cell to a string
  */
-export type TableValueConverterFunc<T> = (value: T) => string;
+// export type TableValueConverterFunc<T> = (value: T) => string;
 
 /**
  * Callback for viewing a row in a PaginatedTable

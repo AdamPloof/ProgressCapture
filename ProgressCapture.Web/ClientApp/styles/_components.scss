@@ -2,6 +2,9 @@
 @import "variables";
 @import "fonts";
 
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/variables-dark";
+
 .component-container {
     position: relative;
 }
@@ -102,4 +105,35 @@
 
 .progress-type-form-wrapper {
     background-color: $sl-theme-dark;
+}
+
+a.col-sort-link {
+    color: $table-color;
+    text-decoration: none;
+
+    &:hover {
+        color: $sl-grey-light;
+    }
+}
+
+.col-sort-desc::after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+}
+
+.col-sort-asc::after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: 0;
+    border-right: .3em solid transparent;
+    border-bottom: .3em solid;
+    border-left: .3em solid transparent;
 }
