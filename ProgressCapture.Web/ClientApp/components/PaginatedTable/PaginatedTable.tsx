@@ -1,7 +1,15 @@
 import React, { JSX, useState, useMemo } from 'react';
+import { Pagination } from 'react-bootstrap';
 import TableRowOptions from './TableRowOptions';
 import { PaginatedTableProps, SortOrder } from 'types/props';
 import { titleCase } from '../../includes/utils';
+import { DEFAULT_PAGE_SIZE } from '../../includes/consts';
+
+interface Page {
+    key: string;
+    active: boolean;
+    pageNum: number;
+}
 
 /**
  * PaginatedTable is a generic table view for a collection of data. It provides ready-to-go filtering
@@ -17,6 +25,9 @@ export default function PaginatedTable<T extends object>(
         month: '2-digit',
         year: 'numeric'
     };
+
+    const [currentPage, setCurrentPage] = useState<number>(0); // 0 indexed
+    const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
 
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
     const [sortField, setSortField] = useState<keyof T | null>(() => {
@@ -125,14 +136,118 @@ export default function PaginatedTable<T extends object>(
         }
     }
 
+    const paginator = (): JSX.Element => {
+        const pageCount = Math.ceil(props.values.length / pageSize);
+        // restrict page options to current page +-2
+        const visiblePageNums: number[] = [
+            currentPage - 2,
+            currentPage - 1,
+            currentPage,
+            currentPage + 1,
+            currentPage + 2
+        ];
+        const pages: Page[] = [];
+        let hasLowEllipses = false;
+        let hasHighEllipses = false;
+        for (let i = 0; i < pageCount; i++) {
+            if (visiblePageNums.includes(i)) {
+                pages.push({
+                    key: `page_${i}`,
+                    pageNum: i,
+                    active: i === currentPage
+                });
+            } else if (i < visiblePageNums[0] && !hasLowEllipses) {
+                hasLowEllipses = true;
+                pages.push({
+                    key: `ellipses_${i}`,
+                    pageNum: i,
+                    active: false
+                });
+            } else if (i > visiblePageNums[0] && !hasHighEllipses) {
+                hasHighEllipses = true;
+                pages.push({
+                    key: `ellipses_${i}`,
+                    pageNum: i,
+                    active: false
+                });
+            }
+        }
+
+        return (
+            <Pagination>
+                <Pagination.First
+                    disabled={currentPage === 0}
+                    onClick={() => {
+                        if (currentPage > 0) {
+                            setCurrentPage(0);
+                        }
+                    }}
+                />
+                <Pagination.Prev
+                    disabled={currentPage === 0}
+                    onClick={() => {
+                        if (currentPage - 1 >= 0) {
+                            setCurrentPage(currentPage - 1);
+                        }
+                    }}
+                />
+
+                {pages.map(p => {
+                    if (p.key.startsWith('ellipses')) {
+                        return (
+                            <Pagination.Ellipsis />
+                        );
+                    }
+
+                    return (
+                        <Pagination.Item
+                            key={p.key}
+                            active={p.active}
+                            onClick={() => {
+                                if (!p.active) {
+                                    setCurrentPage(p.pageNum);
+                                }
+                            }}
+                        >{p.pageNum + 1}</Pagination.Item>
+                    );
+                })}
+
+                <Pagination.Next
+                    disabled={currentPage === pages.length - 1}
+                    onClick={() => {
+                        if (currentPage + 1 <= pageCount - 1) {
+                            setCurrentPage(currentPage + 1);
+                        }
+                    }}
+                />
+                <Pagination.Last
+                    disabled={currentPage === pages.length - 1}
+                    onClick={() => {
+                        if (currentPage < pageCount - 1) {
+                            setCurrentPage(pageCount - 1);
+                        }
+                    }}
+                />
+            </Pagination>
+        );
+    };
+
+    const pageStart = currentPage * pageSize;
+    const pageEnd = pageStart + pageSize;
+
     return (
-        <table className={props.tableClass ? props.tableClass : "table"}>
-            <thead>
-                {tableHeaders()}
-            </thead>
-            <tbody>
-                {sortedValues.map(tableRow)}
-            </tbody>
-        </table>
+        <div className="paginated-table-container d-flex flex-column">
+            <table className={props.tableClass ? props.tableClass : "table"}>
+                <thead>
+                    {tableHeaders()}
+                </thead>
+                <tbody>
+                    {sortedValues.slice(pageStart, pageEnd).map(tableRow)}
+                </tbody>
+            </table>
+            <div className="page-control-footer d-flex flex-row justify-content-center align-items-center">
+                {paginator()}
+            </div>
+        </div>
     );
 }
