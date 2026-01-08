@@ -137,3 +137,20 @@ a.col-sort-link {
     border-bottom: .3em solid;
     border-left: .3em solid transparent;
 }
+
+.monthly-calendar-day {
+    display: flex;
+    flex-direction: column;
+    border-left: $border-main;
+    border-right: $border-main;
+    
+    .calendar-day-label {
+        display: flex;
+        justify-content: center;
+
+        .today {
+            background-color: $sl-brown-lighter;
+            color: $sl-grey-darkest;
+        }
+    }
+}

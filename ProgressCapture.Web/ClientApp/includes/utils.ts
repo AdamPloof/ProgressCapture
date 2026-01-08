@@ -89,6 +89,20 @@ export function formatDateYmd(date: Date): string {
 }
 
 /**
+ * Get the short name for the day of a week for a date
+ * 
+ * @param date 
+ * @returns 
+ */
+export function getDayOfWeekName(date: Date): string {
+    const WEEKDAYS = [
+        'SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'
+    ];
+
+    return WEEKDAYS[date.getDay()];
+}
+
+/**
  * Returns a copy of a string converted to sentence case
  * 
  * Example

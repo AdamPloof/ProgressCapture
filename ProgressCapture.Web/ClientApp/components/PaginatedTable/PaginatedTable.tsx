@@ -213,7 +213,7 @@ export default function PaginatedTable<T extends object>(
                 })}
 
                 <Pagination.Next
-                    disabled={currentPage === pages.length - 1}
+                    disabled={currentPage === pageCount - 1}
                     onClick={() => {
                         if (currentPage + 1 <= pageCount - 1) {
                             setCurrentPage(currentPage + 1);
@@ -221,7 +221,7 @@ export default function PaginatedTable<T extends object>(
                     }}
                 />
                 <Pagination.Last
-                    disabled={currentPage === pages.length - 1}
+                    disabled={currentPage === pageCount - 1}
                     onClick={() => {
                         if (currentPage < pageCount - 1) {
                             setCurrentPage(pageCount - 1);

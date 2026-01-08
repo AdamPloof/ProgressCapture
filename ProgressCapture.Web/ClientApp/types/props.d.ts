@@ -88,3 +88,11 @@ export interface TableRowOptionsProps<T> {
     handleEdit: HandleEditFunc<T> | null;
     handleDelete: HandleDeleteFunc<T> | null;
 }
+
+/**
+ * DayOfMonth component for MonthlyCalendar
+ */
+export interface DayOfMonthProps {
+    date: Date;
+    progressEntries: ProgressEntry[];
+}

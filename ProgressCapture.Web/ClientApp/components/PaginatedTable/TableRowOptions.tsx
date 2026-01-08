@@ -1,6 +1,7 @@
 import React, { JSX } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { TableRowOptionsProps } from 'types/props';
+import { URL_IMAGE_ROOT } from '../../includes/paths';
 
 export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.Element {
     const items: JSX.Element[] = [];
@@ -50,7 +51,11 @@ export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.
     return (
         <Dropdown>
             <Dropdown.Toggle variant="secondary" id="dropdown-basic" size='sm'>
-                Options
+                <img
+                    src={`${URL_IMAGE_ROOT}/icons/edit_document_dark.svg`}
+                    alt="Progress entry options"
+                    title="Progress entry options"
+                />
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 {items.map(i => i)}
