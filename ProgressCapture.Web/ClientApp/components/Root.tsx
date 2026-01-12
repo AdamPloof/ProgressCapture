@@ -1,7 +1,24 @@
-import React, { StrictMode } from "react";
+import React, { JSX, StrictMode } from "react";
 import { createRoot } from 'react-dom/client';
-import GoalManager from "./Goals/GoalManager";
+import ProgressTable from "./ProgressTable/ProgressTable";
+import ProgressCalendar from "./ProgressCalendar/ProgressCalendar";
 import { WidgetProps } from "../types/props";
+
+function componentFactory(componentType: string, props: WidgetProps): JSX.Element {
+    let component: JSX.Element;
+    switch (componentType) {
+        case 'ProgressTable':
+            component = <ProgressTable {...props}></ProgressTable>;
+            break;
+        case 'ProgressCalendar':
+            component = <ProgressCalendar {...props}></ProgressCalendar>;
+            break;
+        default:
+            throw new Error(`Unknown component type: ${componentType}`);
+    }
+
+    return component;
+}
 
 function main(): void {
     const rootContainer: HTMLElement | null = document.getElementById('pc-root-container');
@@ -9,12 +26,12 @@ function main(): void {
         return;
     }
 
-    // const Component = ComponentFactory(rootContainer.dataset.componentType ?? '');
     const componentProps: WidgetProps = {entityId: Number(rootContainer.dataset.entityId) ?? null}
+    const componentType: string = rootContainer.dataset.componentType ?? '';
     const root = createRoot(rootContainer);
     root.render(
         <StrictMode>
-            <GoalManager {...componentProps} />
+            {componentFactory(componentType, componentProps)}
         </StrictMode>
     );
 }

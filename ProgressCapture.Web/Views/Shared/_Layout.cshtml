@@ -13,31 +13,33 @@
     <link rel="stylesheet" href="~/ProgressCapture.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        @await Html.PartialAsync(partialViewName: "_Nav")
-    </header>
-    <div class="container-fluid">
-        @{ FlashMessage? flash =  TempData.Get<FlashMessage>("FlashMessage"); }
-        @if (flash is not null) {
-            <div class="alert alert-@flash.Type">
-                @if (flash.Title is not null) {
-                    <div class="alert-heading">
-                        <h4>@flash.Title</h4>
-                    </div>
-                }
-                @flash.Message
-            </div>
-        }
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ProgressCapture.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="app-layout">
+        <header>
+            @await Html.PartialAsync(partialViewName: "_Nav")
+        </header>
+        <div class="container-fluid d-flex flex-column flex-grow-1">
+            @{ FlashMessage? flash =  TempData.Get<FlashMessage>("FlashMessage"); }
+            @if (flash is not null) {
+                <div class="alert alert-@flash.Type">
+                    @if (flash.Title is not null) {
+                        <div class="alert-heading">
+                            <h4>@flash.Title</h4>
+                        </div>
+                    }
+                    @flash.Message
+                </div>
+            }
+            <main role="main" class="d-flex flex-grow-1 pb-3">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - ProgressCapture.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    </div>
     <script src="~/dist/bundle.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

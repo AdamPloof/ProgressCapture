@@ -1,8 +1,8 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
-import SummarySidebar from './SummarySidebar';
+import SummarySidebar from '../Common/SummarySidebar';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import TableRowSorter from '../PaginatedTable/TableRowSorter';
-import ProgressModal from './ProgressModal';
+import ProgressModal from '../Common/ProgressModal';
 import Loader from '../Common/Loader';
 import ConfirmationModal from '../Common/ConfirmationModal';
 import AlertDismissible from '../Common/AlertDismissable';
@@ -340,43 +340,6 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         });
     };
 
-    const progressTable = (): JSX.Element => {
-        if (entryLoading) {
-            return <Loader />;
-        }
-
-        const rowSorter = new TableRowSorter();
-
-        return (
-            <PaginatedTable<ProgressEntryTableRow>
-                tableClass='table table-striped'
-                fields={['id', 'date', 'type', 'amount', 'notes']}
-                values={progressEntries.map((e): ProgressEntryTableRow => {
-                    return {
-                        id: e.id,
-                        date: e.date,
-                        type: e.progressType.name,
-                        amount: e.amount,
-                        notes: e.notes
-                    };
-                })}
-                rowSorter={rowSorter}
-                defaultSortField={'date'}
-                handleView={null}
-                handleEdit={handleEditProgressEntry}
-                handleDelete={handleDeleteProgressEntry}
-            ></PaginatedTable>
-        );
-    };
-
-    const noEntriesRow = (): JSX.Element => {
-        return (
-            <tr>
-                <td colSpan={4}>No progress recorded yet. <a href="#">Add an entry</a> to get started</td>
-            </tr>
-        );
-    }
-
     const errorAlert = (): JSX.Element => {
         return (
             <AlertDismissible
@@ -415,7 +378,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
             <div className="content-wrapper d-flex flex-row justify-content-between">
                 <div className="goal-manager container border">
                     {widgetHeader()}
-                    {progressTable()}
+                    
                 </div>
                 <SummarySidebar
                     goal={goal}

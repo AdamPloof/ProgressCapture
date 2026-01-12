@@ -6,7 +6,7 @@
     <ul class="list-group">
         @foreach (GoalViewModel goal in Model.Goals) {
             <li class="list-group-item">
-                <a asp-route="ViewGoal" asp-route-goalId="@goal.Id">@goal.Name</a>
+                <a asp-route="GoalTable" asp-route-goalId="@goal.Id">@goal.Name</a>
             </li>
         }
     </ul>

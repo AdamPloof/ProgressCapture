@@ -138,11 +138,60 @@ a.col-sort-link {
     border-left: .3em solid transparent;
 }
 
+// Progress Calendar
+.calendar-wrapper {
+    width: 100%;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+$calendar-item-padding: .2rem .5rem;
+
+.progress-calendar {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        width: 100%;
+    
+        .weekday-label {
+            flex: 1;
+            padding: $calendar-item-padding;
+            border-right: $border-main;
+            border-top: $border-main;
+    
+            &:first-of-type {
+                border-left: $border-main;
+            }
+        }
+    }
+    
+    .calendar-body {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        width: 100%;
+        border-top: $border-main;
+        height: 100%;
+    }
+}
+
 .monthly-calendar-day {
     display: flex;
     flex-direction: column;
-    border-left: $border-main;
+    flex-grow: 1;
     border-right: $border-main;
+    padding: $calendar-item-padding;
+    border-bottom: $border-main;
+
+    &:first-child,
+    &:nth-child(7n + 8) {
+        border-left: $border-main;
+    }
     
     .calendar-day-label {
         display: flex;

@@ -1,7 +1,8 @@
 import React, { JSX, useState } from 'react';
+import { WidgetProps } from 'types/props';
 import DayOfMonth from './DayOfMonth';
 
-export default function ProgressCalendar(): JSX.Element {
+export default function ProgressCalendar(props: WidgetProps): JSX.Element {
     // currentMonth is 0 indexed: jan == 0, dec == 11
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
@@ -19,6 +20,7 @@ export default function ProgressCalendar(): JSX.Element {
         for (let i = 1; i < 35; i++) {
             const nextDate = new Date(firstOfMonth);
             nextDate.setDate(nextDate.getDate() + i);
+            dates.push(nextDate);
         }
 
         return dates;

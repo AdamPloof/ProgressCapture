@@ -16,8 +16,22 @@ public class GoalController : Controller {
         _context = context;
     }
 
-    [HttpGet("{goalId}", Name = "ViewGoal")]
-    public async Task<IActionResult> View(int goalId) {
+    [HttpGet("table/{goalId}", Name = "GoalTable")]
+    public async Task<IActionResult> Table(int goalId) {
+        Goal? goal = await _context.Goals.FindAsync(goalId);
+        if (goal == null) {
+            return NotFound();
+        }
+
+        return View(new GoalViewModel() {
+            Id = goal.Id,
+            Name = goal.Name,
+            Description = goal.Description
+        });
+    }
+
+    [HttpGet("calendar/{goalId}", Name = "GoalCalendar")]
+    public async Task<IActionResult> Calendar(int goalId) {
         Goal? goal = await _context.Goals.FindAsync(goalId);
         if (goal == null) {
             return NotFound();
@@ -139,7 +153,8 @@ public class GoalController : Controller {
 
         _context.Update(goal);
         await _context.SaveChangesAsync();
+        // TODO: redirect to user's most recent view type (table/calendar)
 
-        return RedirectToRoute("ViewGoal", new {goalId = model.Id});
+        return RedirectToRoute("GoalTable", new { goalId = model.Id });
     }
 }
