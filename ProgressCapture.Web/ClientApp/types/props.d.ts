@@ -43,8 +43,72 @@ export interface GoalSummaryProps {
     stats: ProgressStat[];
 }
 
+/**
+ * ## Progress Controls ##
+ * These types are used to provide a generic interface to allow for different
+ * ways of displaying an editing ProgressEntries. For example, the calendar view or
+ * the table view
+ */
+
+/**
+ * ProgressManager provides the core functionality of the view for progress
+ * entries. It takes in the ProgressControl as a prop.
+ */
+export interface ProgressManagerProps {
+    goalId: number;
+    control: ProgressControl;
+}
+
+/**
+ * Any entity with an `id` property is Identifiable
+ */
+export interface Identifiable {
+    id: number;
+}
+
+/**
+ * ProgressControl is the main content control/widget for displaying
+ * progress entries.
+ */
+export interface ProgressControlProps {
+    goal: Goal | null;
+    entries: ProgressEntry[];
+    goalLoading: boolean;
+    progressLoading: boolean;
+    handleView: HandleViewFunc | null;
+    handleCreate: HandleCreateFunc | null;
+    handleEdit: HandleEditFunc | null;
+    handleDelete: HandleDeleteFunc | null;
+}
+
+/**
+ * A ProgressControl is a functional component responsible for rendering a set
+ * of Progress Entries.
+ */
+export type ProgressControl = (props: ProgressControlProps) => JSX.Element;
+
+/**
+ * Callback for creating a new entity from ProgressControl
+ */
+export type HandleCreateFunc = () => void;
+
+/**
+ * Callback for viewing an entity from a ProgressControl
+ */
+export type HandleViewFunc = (entityId: number) => void;
+
+/**
+ * Callback for editing an entity from a ProgressControl
+ */
+export type HandleEditFunc = (entityId: number) => void;
+
+/**
+ * Callback for deleting an entity from a ProgressControl
+ */
+export type HandleDeleteFunc = (entityId: number) => void;
+
 // PaginatedTable props and interfaces
-export interface PaginatedTableProps<T extends object> {
+export interface PaginatedTableProps<T extends Identifiable> {
     tableClass?: string;
     fields: (keyof T)[];
     values: T[];
@@ -66,27 +130,12 @@ export interface IRowSorter<T> {
  */
 // export type TableValueConverterFunc<T> = (value: T) => string;
 
-/**
- * Callback for viewing a row in a PaginatedTable
- */
-export type HandleViewFunc<T> = (value: T) => void;
-
-/**
- * Callback for editing a row in a PaginatedTable
- */
-export type HandleEditFunc<T> = (value: T) => void;
-
-/**
- * Callback for deleting a row in a PaginatedTable
- */
-export type HandleDeleteFunc<T> = (value: T) => void;
-
 export interface TableRowOptionsProps<T> {
     entity: T;
     rowIndex: number;
-    handleView: HandleViewFunc<T> | null;
-    handleEdit: HandleEditFunc<T> | null;
-    handleDelete: HandleDeleteFunc<T> | null;
+    handleView: HandleViewFunc | null;
+    handleEdit: HandleEditFunc | null;
+    handleDelete: HandleDeleteFunc | null;
 }
 
 /**

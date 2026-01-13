@@ -10,6 +10,8 @@
 
 .content-wrapper {
     width: 100%;
+    display: flex;
+    flex: 1 1 auto;
     padding-left: 4rem;
     padding-right: 4rem;
     margin-right: auto;

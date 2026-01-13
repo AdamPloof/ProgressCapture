@@ -1,7 +1,7 @@
 import React, { JSX, useState, useMemo } from 'react';
 import { Pagination } from 'react-bootstrap';
 import TableRowOptions from './TableRowOptions';
-import { PaginatedTableProps, SortOrder } from 'types/props';
+import { PaginatedTableProps, SortOrder, Identifiable } from 'types/props';
 import { titleCase } from '../../includes/utils';
 import { DEFAULT_PAGE_SIZE } from '../../includes/consts';
 
@@ -17,7 +17,7 @@ interface Page {
  * 
  * @param props 
  */
-export default function PaginatedTable<T extends object>(
+export default function PaginatedTable<T extends Identifiable>(
     props: PaginatedTableProps<T>
 ): JSX.Element {
     const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {

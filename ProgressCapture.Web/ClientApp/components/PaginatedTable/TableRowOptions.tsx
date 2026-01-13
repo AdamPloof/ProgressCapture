@@ -1,10 +1,13 @@
 import React, { JSX } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { TableRowOptionsProps } from 'types/props';
+import { TableRowOptionsProps, Identifiable } from 'types/props';
 import { URL_IMAGE_ROOT } from '../../includes/paths';
 
-export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.Element {
+export default function TableRowOptions<T extends Identifiable>(
+    props: TableRowOptionsProps<T>
+): JSX.Element {
     const items: JSX.Element[] = [];
+    
     if (props.handleView !== null) {
         items.push(
             <Dropdown.Item
@@ -12,7 +15,7 @@ export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.
                 key={`${props.rowIndex}_view`}
                 onClick={(e) => {
                     e.preventDefault();
-                    props.handleView!(props.entity);
+                    props.handleView!(props.entity.id);
                 }}
             >View</Dropdown.Item>
         );
@@ -25,7 +28,7 @@ export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.
                 key={`${props.rowIndex}_edit`}
                 onClick={(e) => {
                     e.preventDefault();
-                    props.handleEdit!(props.entity);
+                    props.handleEdit!(props.entity.id);
                 }}
             >Edit</Dropdown.Item>
         );
@@ -41,7 +44,7 @@ export default function TableRowOptions<T>(props: TableRowOptionsProps<T>): JSX.
                     bsPrefix='dropdown-item text-danger'
                     onClick={(e) => {
                         e.preventDefault();
-                        props.handleDelete!(props.entity);
+                        props.handleDelete!(props.entity.id);
                     }}
                 >Delete</Dropdown.Item>
             </React.Fragment>

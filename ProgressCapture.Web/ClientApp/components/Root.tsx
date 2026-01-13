@@ -1,23 +1,24 @@
 import React, { JSX, StrictMode } from "react";
 import { createRoot } from 'react-dom/client';
+import ProgressManager from "./ProgressManager";
 import ProgressTable from "./ProgressTable/ProgressTable";
 import ProgressCalendar from "./ProgressCalendar/ProgressCalendar";
-import { WidgetProps } from "../types/props";
+import { ProgressControl } from "types/props";
 
-function componentFactory(componentType: string, props: WidgetProps): JSX.Element {
-    let component: JSX.Element;
+function componentFactory(componentType: string, goalId: number): JSX.Element {
+    let control: ProgressControl;
     switch (componentType) {
         case 'ProgressTable':
-            component = <ProgressTable {...props}></ProgressTable>;
+            control = ProgressTable;
             break;
         case 'ProgressCalendar':
-            component = <ProgressCalendar {...props}></ProgressCalendar>;
+            control = ProgressCalendar
             break;
         default:
             throw new Error(`Unknown component type: ${componentType}`);
     }
 
-    return component;
+    return <ProgressManager goalId={goalId} control={control}></ProgressManager>;
 }
 
 function main(): void {
@@ -26,12 +27,16 @@ function main(): void {
         return;
     }
 
-    const componentProps: WidgetProps = {entityId: Number(rootContainer.dataset.entityId) ?? null}
+    if (!rootContainer.dataset.entityId) {
+        throw new Error(`Root container must define an entity ID. Got ${rootContainer.dataset.entityId}`);
+    }
+
+    const goalId = Number(rootContainer.dataset.entityId);
     const componentType: string = rootContainer.dataset.componentType ?? '';
     const root = createRoot(rootContainer);
     root.render(
         <StrictMode>
-            {componentFactory(componentType, componentProps)}
+            {componentFactory(componentType, goalId)}
         </StrictMode>
     );
 }

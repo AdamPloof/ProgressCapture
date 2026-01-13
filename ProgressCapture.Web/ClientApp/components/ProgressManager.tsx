@@ -1,29 +1,25 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
-import SummarySidebar from '../Common/SummarySidebar';
-import PaginatedTable from '../PaginatedTable/PaginatedTable';
-import TableRowSorter from '../PaginatedTable/TableRowSorter';
-import ProgressModal from '../Common/ProgressModal';
-import Loader from '../Common/Loader';
-import ConfirmationModal from '../Common/ConfirmationModal';
-import AlertDismissible from '../Common/AlertDismissable';
-import { WidgetProps } from 'types/props';
+import SummarySidebar from './Common/SummarySidebar';
+import ProgressModal from './Common/ProgressModal';
+import ConfirmationModal from './Common/ConfirmationModal';
+import AlertDismissible from './Common/AlertDismissable';
+import { ProgressManagerProps } from 'types/props';
 import {
     fetchData,
     replaceUrlPlaceholders,
     calculateProgressStats,
-} from '../../includes/utils';
+} from '../includes/utils';
 import {
     Goal,
     ProgressEntry,
     ProgressType,
     ProgressEntryInputModel,
-    ProgressEntryTableRow
-} from '../../types/entities';
+} from '../types/entities';
 import {
     goalTransformer,
     progressEntriesTransformer,
     progressTypeTransformer
-} from '../../includes/transformers';
+} from '../includes/transformers';
 import {
     URL_GOAL,
     URL_GOAL_PROGRESS,
@@ -31,12 +27,12 @@ import {
     URL_ADD_PROGRESS,
     URL_UPDATE_PROGRESS,
     URL_DELETE_PROGRESS,
-} from '../../includes/paths';
+} from '../includes/paths';
 
 /**
  * The main component for managing the progress entries related to a specific goal.
  */
-export default function GoalManager(props: WidgetProps): JSX.Element {
+export default function ProgressManager(props: ProgressManagerProps): JSX.Element {
     const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {
         day: '2-digit',
         month: '2-digit',
@@ -59,7 +55,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const [deleteConfirmationMsg, setDeleteConfirmationMsg] = useState<string | JSX.Element>('');
 
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
-    const [entryLoading, setEntryLoading] = useState<boolean>(false);
+    const [progressLoading, setprogressLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -84,7 +80,7 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     const fetchGoal = async (): Promise<void> => {
         setGoalLoading(true);
         try {
-            const url = replaceUrlPlaceholders(URL_GOAL, [String(props.entityId)]);
+            const url = replaceUrlPlaceholders(URL_GOAL, [String(props.goalId)]);
             const goal = await fetchData(url, goalTransformer);
             setGoal(goal);
             setGoalLoading(false);
@@ -97,24 +93,24 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
     };
 
     const fetchProgressEntries = async (): Promise<void> => {
-        setEntryLoading(true);
+        setprogressLoading(true);
         try {
-            const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS, [String(props.entityId)]);
+            const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS, [String(props.goalId)]);
             const entries = await fetchData<ProgressEntry[]>(url, progressEntriesTransformer);
             setProgressEntries([...entries]);
-            setEntryLoading(false);
+            setprogressLoading(false);
         } catch (err) {
             if (err instanceof Error) {
                 setError(`Unable to load progress entries. Error: ${err.message}`);
             }
-            setEntryLoading(false);
+            setprogressLoading(false);
         }
     };
 
     const fetchProgressTypes = async (): Promise<void> => {
         // Background fetch, no loading indicator needed.
         try {
-            const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS_TYPES, [String(props.entityId)]);
+            const url = replaceUrlPlaceholders(URL_GOAL_PROGRESS_TYPES, [String(props.goalId)]);
             const types = await fetchData<ProgressType[]>(url, progressTypeTransformer);
             setProgressTypes([...types]);
         } catch (err) {
@@ -274,10 +270,10 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         handleShowModal();
     };
 
-    const handleEditProgressEntry = (row: ProgressEntryTableRow): void => {
-        const selectedEntry = progressEntries.find(e => e.id === row.id);
+    const handleEditProgressEntry = (entityId: number): void => {
+        const selectedEntry = progressEntries.find(e => e.id === entityId);
         if (!selectedEntry) {
-            throw new Error(`Unable to edit entry. Could not find entry for id ${row.id}.`);
+            throw new Error(`Unable to edit entry. Could not find entry for id ${entityId}.`);
         }
 
         setInputModel({
@@ -291,19 +287,20 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         handleShowModal();
     };
 
-    const handleDeleteProgressEntry = (row: ProgressEntryTableRow): void => {
+    const handleDeleteProgressEntry = (entityId: number): void => {
+        const targetEntry = progressEntries.find(p => p.id === entityId);
+        if (!targetEntry) {
+            throw new Error(`Could not delete progress entry. No progress found for ID: ${entityId}`);
+        }
+
         setInputModel({
-            id: row.id,
+            id: entityId,
             goalId: null,
             date: null,
             amount: 0,
             notes: null,
             progressTypeId: null
         });
-        const targetEntry = progressEntries.find(p => p.id === row.id);
-        if (!targetEntry) {
-            throw new Error(`Could not delete progress entry. No progress found for ID: ${row.id}`);
-        }
 
         const msg = (
             <React.Fragment>
@@ -351,35 +348,20 @@ export default function GoalManager(props: WidgetProps): JSX.Element {
         );
     };
 
-    const widgetHeader = (): JSX.Element => {
-        if (goalLoading) {
-            return (
-                <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
-                    <div className="header-info"><h2>{goal ? goal.name : '...'}</h2></div>
-                </div>    
-            );
-        }
-
-        return (
-            <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
-                <div className="header-info"><h2>{goal ? goal.name : '...'}</h2></div>
-                <div className="header-tools d-flex justify-content-end">
-                    <button className='btn btn-primary' onClick={handleAddProgressEntry}>
-                        Add Progress
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <React.Fragment>
             {error ? errorAlert() : null}
             <div className="content-wrapper d-flex flex-row justify-content-between">
-                <div className="goal-manager container border">
-                    {widgetHeader()}
-                    
-                </div>
+                <props.control
+                    goal={goal}
+                    entries={progressEntries}
+                    goalLoading={goalLoading}
+                    progressLoading={progressLoading}
+                    handleView={null}
+                    handleCreate={handleAddProgressEntry}
+                    handleEdit={handleEditProgressEntry}
+                    handleDelete={handleDeleteProgressEntry}
+                ></props.control>
                 <SummarySidebar
                     goal={goal}
                     stats={stats}
