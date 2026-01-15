@@ -196,9 +196,17 @@ $calendar-item-padding: .2rem .5rem;
     .calendar-day-label {
         display: flex;
         justify-content: center;
+        align-items: center;
+        width: fit-content;
+        padding: .25rem .5rem;
+        border-radius: 1rem;
 
-        .today {
-            background-color: $sl-brown-lighter;
+        &.outside-month-day {
+            color: $sl-grey;
+        }
+
+        &.today {
+            background-color: $sl-brown-lightest;
             color: $sl-grey-darkest;
         }
     }

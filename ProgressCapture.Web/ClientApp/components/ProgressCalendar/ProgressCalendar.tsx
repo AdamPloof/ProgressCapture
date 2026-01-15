@@ -1,11 +1,31 @@
-import React, { JSX, useState } from 'react';
-import { ProgressControlProps } from 'types/props';
+import React, { JSX, useState, useMemo } from 'react';
 import DayOfMonth from './DayOfMonth';
+import { ProgressControlProps } from 'types/props';
+import { ProgressEntry } from 'types/entities';
+import { longMonthName, formatDateYmd } from '../../includes/utils';
 
 export default function ProgressCalendar(props: ProgressControlProps): JSX.Element {
     // currentMonth is 0 indexed: jan == 0, dec == 11
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+
+    /**
+     * Map of date string (yyyy-mm-dd) to the progress entries
+     * associated with that day.
+     */
+    const dailyEntries: Map<string, ProgressEntry[]> = useMemo(() => {
+        const entryMap = new Map<string, ProgressEntry[]>();
+        for (const e of props.entries) {
+            const dateStr = formatDateYmd(e.date);
+            if (!entryMap.has(dateStr)) {
+                entryMap.set(dateStr, []);
+            }
+
+            entryMap.get(dateStr)?.push(e);
+        }
+
+        return entryMap;
+    }, [props.entries, currentMonth, currentYear]);
 
     const getDates = (): Date[] => {
         const firstOfMonth = new Date(currentYear, currentMonth, 1);
@@ -16,9 +36,9 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
             "First day of calendar should always be a Sunday"
         );
 
-        const dates: Date[] = [firstOfMonth];
+        const dates: Date[] = [firstOfCalendar];
         for (let i = 1; i < 35; i++) {
-            const nextDate = new Date(firstOfMonth);
+            const nextDate = new Date(firstOfCalendar);
             nextDate.setDate(nextDate.getDate() + i);
             dates.push(nextDate);
         }
@@ -29,8 +49,10 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
     const widgetHeader = (): JSX.Element => {
         if (props.goalLoading) {
             return (
-                <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
-                    <div className="header-info"><h2>{props.goal ? props.goal.name : '...'}</h2></div>
+                <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-3">
+                    <div className="header-info">
+                        <h2 className='mb-0'>{props.goal ? props.goal.name : '...'}</h2>
+                    </div>
                 </div>
             );
         }
@@ -39,12 +61,9 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
             <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
                 <div className="header-info"><h2>{props.goal ? props.goal.name : '...'}</h2></div>
                 <div className="header-tools d-flex justify-content-end">
-                    <button
-                        className='btn btn-primary'
-                        onClick={props.handleCreate ? props.handleCreate : () => { console.error('No add handler set'); }}
-                    >
-                        Add Progress
-                    </button>
+                    <h3 className='mb-0'>
+                        {longMonthName(new Date(currentYear, currentMonth, 1))} {currentYear}
+                    </h3>
                 </div>
             </div>
         );
@@ -66,7 +85,12 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                     </div>
                     <div className="calendar-body">
                         {getDates().map(
-                            d => <DayOfMonth key={d.getTime()} date={d} progressEntries={[]}></DayOfMonth>
+                            d => <DayOfMonth
+                                key={d.getTime()}
+                                date={d}
+                                progressEntries={dailyEntries.get(formatDateYmd(d)) ?? []}
+                                inCurrentMonth={d.getMonth() === currentMonth}
+                            ></DayOfMonth>
                         )}
                     </div>
                 </div>

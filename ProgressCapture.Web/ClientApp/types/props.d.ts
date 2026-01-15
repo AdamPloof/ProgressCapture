@@ -144,4 +144,5 @@ export interface TableRowOptionsProps<T> {
 export interface DayOfMonthProps {
     date: Date;
     progressEntries: ProgressEntry[];
+    inCurrentMonth: boolean;
 }

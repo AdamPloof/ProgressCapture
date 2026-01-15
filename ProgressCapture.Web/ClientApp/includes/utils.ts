@@ -102,6 +102,24 @@ export function getDayOfWeekName(date: Date): string {
     return WEEKDAYS[date.getDay()];
 }
 
+export function longMonthName(date: Date): string {
+    const MONTHS = [
+        'January',
+        'February',
+        'March',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+    ];
+
+    return MONTHS[date.getMonth()];
+}
+
 /**
  * Returns a copy of a string converted to sentence case
  * 
