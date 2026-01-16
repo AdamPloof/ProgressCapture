@@ -147,11 +147,25 @@ a.col-sort-link {
 
 $calendar-item-padding: .2rem .5rem;
 
+.progress-calendar-header {
+    position: relative;
+
+    .date-select-control {
+        // TODO: temporary positioning to fix bouncing due to month name
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        top: 25%;
+        left: 45%;
+    }
+}
+
 .progress-calendar {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
     width: 100%;
+
 
     .calendar-weekdays {
         display: grid;
@@ -209,5 +223,9 @@ $calendar-item-padding: .2rem .5rem;
             background-color: $sl-brown-lightest;
             color: $sl-grey-darkest;
         }
+    }
+
+    .progress-entry {
+        font-size: 90%;
     }
 }

@@ -3,6 +3,7 @@ import DayOfMonth from './DayOfMonth';
 import { ProgressControlProps } from 'types/props';
 import { ProgressEntry } from 'types/entities';
 import { longMonthName, formatDateYmd } from '../../includes/utils';
+import { URL_IMAGE_ROOT } from '../../includes/paths';
 
 export default function ProgressCalendar(props: ProgressControlProps): JSX.Element {
     // currentMonth is 0 indexed: jan == 0, dec == 11
@@ -46,24 +47,65 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
         return dates;
     };
 
+    const monthSelect = (): JSX.Element => {
+        return (
+            <div className="date-select-control d-flex flex-row flex-shrink-1">
+                <button className="btn btn-outline-primary me-4">
+                    Today
+                </button>
+                <button
+                    className="btn btn-outline-secondary me-2"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        if (currentMonth === 0) {
+                            setCurrentMonth(11);
+                            setCurrentYear(currentYear - 1);
+                        } else {
+                            setCurrentMonth(currentMonth - 1);
+                        }
+                    }}
+                >
+                    <img src={`${URL_IMAGE_ROOT}/icons/backward_dark.svg`} alt="Previous month" />
+                </button>
+                <button
+                    className="btn btn-outline-secondary"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        if (currentMonth === 11) {
+                            setCurrentMonth(0);
+                            setCurrentYear(currentYear + 1);
+                        } else {
+                            setCurrentMonth(currentMonth + 1);
+                        }
+                    }}
+                >
+                    <img src={`${URL_IMAGE_ROOT}/icons/forward_dark.svg`} alt="Next month" />
+                </button>
+            </div>
+        );
+    };
+
     const widgetHeader = (): JSX.Element => {
         if (props.goalLoading) {
             return (
-                <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-3">
-                    <div className="header-info">
-                        <h2 className='mb-0'>{props.goal ? props.goal.name : '...'}</h2>
+                <div className="progress-calendar-header d-flex flex-row justify-content-between border-bottom p-3">
+                    <div className="header-info d-flex align-items-end">
+                        <h3 className='mb-0'>{props.goal ? props.goal.name : '...'}</h3>
                     </div>
                 </div>
             );
         }
 
         return (
-            <div className="goal-manager-header d-flex flex-row justify-content-between border-bottom p-4">
-                <div className="header-info"><h2>{props.goal ? props.goal.name : '...'}</h2></div>
-                <div className="header-tools d-flex justify-content-end">
-                    <h3 className='mb-0'>
+            <div className="progress-calendar-header d-flex flex-row justify-content-between border-bottom p-3">
+                <div className="header-info d-flex align-items-end">
+                    <h3 className='mb-0'>{props.goal ? props.goal.name : '...'}</h3>
+                </div>
+                {monthSelect()}
+                <div className="header-tools d-flex justify-content-end align-items-end">
+                    <h4 className='mb-0'>
                         {longMonthName(new Date(currentYear, currentMonth, 1))} {currentYear}
-                    </h3>
+                    </h4>
                 </div>
             </div>
         );

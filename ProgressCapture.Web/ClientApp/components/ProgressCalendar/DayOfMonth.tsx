@@ -36,7 +36,7 @@ export default function DayOfMonth(props: DayOfMonthProps): JSX.Element {
                     {props.date.getDate()}
                 </div>
             </div>
-            <div className="calendar-day-body">
+            <div className="calendar-day-body d-flex flex-column align-items-start justify-content-end flex-grow-1">
                 {props.progressEntries.map(entryRow)}
             </div>
         </div>
