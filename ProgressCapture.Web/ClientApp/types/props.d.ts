@@ -12,6 +12,22 @@ export interface WidgetProps {
 
 export interface ProgressModalProps {
     show: boolean;
+    handleShow(): void;
+    handleClose(): void;
+    content: JSX.Element | null;
+}
+
+export interface ViewProgressModalProps {
+    show: boolean;
+    entry: ProgressEntry;
+    handleEdit: HandleEditFunc;
+    handleDelete: HandleDeleteFunc;
+    handleShow: () => void;
+    handleClose: () => void;
+}
+
+export interface EditProgressModalProps {
+    show: boolean;
     inputModel: ProgressEntryInputModel;
     progressTypes: ProgressType[];
     setInputModel: React.Dispatch<React.SetStateAction<ProgressEntryInputModel>>;
@@ -75,10 +91,10 @@ export interface ProgressControlProps {
     entries: ProgressEntry[];
     goalLoading: boolean;
     progressLoading: boolean;
-    handleView: HandleViewFunc | null;
-    handleCreate: HandleCreateFunc | null;
-    handleEdit: HandleEditFunc | null;
-    handleDelete: HandleDeleteFunc | null;
+    handleView: HandleViewFunc;
+    handleCreate: HandleCreateFunc;
+    handleEdit: HandleEditFunc;
+    handleDelete: HandleDeleteFunc;
 }
 
 /**
@@ -114,9 +130,9 @@ export interface PaginatedTableProps<T extends Identifiable> {
     values: T[];
     rowSorter: IRowSorter<T>;
     defaultSortField: keyof T | null;
-    handleView: HandleViewFunc<T> | null;
-    handleEdit: HandleEditFunc<T> | null;
-    handleDelete: HandleDeleteFunc<T> | null;
+    handleView: HandleViewFunc<T>;
+    handleEdit: HandleEditFunc<T>;
+    handleDelete: HandleDeleteFunc<T>;
 }
 
 export type SortOrder = 'asc' | 'desc';
@@ -133,9 +149,9 @@ export interface IRowSorter<T> {
 export interface TableRowOptionsProps<T> {
     entity: T;
     rowIndex: number;
-    handleView: HandleViewFunc | null;
-    handleEdit: HandleEditFunc | null;
-    handleDelete: HandleDeleteFunc | null;
+    handleView: HandleViewFunc;
+    handleEdit: HandleEditFunc;
+    handleDelete: HandleDeleteFunc;
 }
 
 /**
@@ -144,5 +160,10 @@ export interface TableRowOptionsProps<T> {
 export interface DayOfMonthProps {
     date: Date;
     progressEntries: ProgressEntry[];
+    progressTypeColorMap: Map<number, number>;
     inCurrentMonth: boolean;
+    handleCreate: HandleCreateFunc;
+    handleView: HandleViewFunc;
+    handleEdit: HandleEditFunc;
+    handleDelete: HandleDeleteFunc;
 }

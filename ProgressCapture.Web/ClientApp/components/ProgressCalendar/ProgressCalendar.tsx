@@ -5,10 +5,33 @@ import { ProgressEntry } from 'types/entities';
 import { longMonthName, formatDateYmd } from '../../includes/utils';
 import { URL_IMAGE_ROOT } from '../../includes/paths';
 
+// TODO: make a color generator that can handle unlimited number of progress types
+const MAX_ENTRY_TYPES = 6;
+
 export default function ProgressCalendar(props: ProgressControlProps): JSX.Element {
     // currentMonth is 0 indexed: jan == 0, dec == 11
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+
+    /**
+     * Map of progress type ID to calendar item color index
+     */
+    const progressTypeColorMap: Map<number, number> = useMemo(() => {
+        const colorMap = new Map<number, number>();
+        let currentIdx = 1;
+        for (const entry of props.entries) {
+            if (!colorMap.has(entry.progressType.id)) {
+                colorMap.set(entry.progressType.id, currentIdx);
+                if (currentIdx === 6) {
+                    currentIdx = 1;
+                } else {
+                    currentIdx++;
+                }
+            }
+        }
+
+        return colorMap;
+    }, [props.entries])
 
     /**
      * Map of date string (yyyy-mm-dd) to the progress entries
@@ -50,7 +73,15 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
     const monthSelect = (): JSX.Element => {
         return (
             <div className="date-select-control d-flex flex-row flex-shrink-1">
-                <button className="btn btn-outline-primary me-4">
+                <button
+                    className="btn btn-outline-primary me-4"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        const today = new Date();
+                        setCurrentYear(today.getFullYear());
+                        setCurrentMonth(today.getMonth());
+                    }}
+                >
                     Today
                 </button>
                 <button
@@ -130,7 +161,12 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                             d => <DayOfMonth
                                 key={d.getTime()}
                                 date={d}
+                                handleCreate={props.handleCreate}
+                                handleView={props.handleView}
+                                handleEdit={props.handleEdit}
+                                handleDelete={props.handleDelete}
                                 progressEntries={dailyEntries.get(formatDateYmd(d)) ?? []}
+                                progressTypeColorMap={progressTypeColorMap}
                                 inCurrentMonth={d.getMonth() === currentMonth}
                             ></DayOfMonth>
                         )}

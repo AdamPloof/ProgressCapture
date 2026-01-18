@@ -1,9 +1,14 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal';
 import SummarySidebar from './Common/SummarySidebar';
 import ProgressModal from './Common/ProgressModal';
-import ConfirmationModal from './Common/ConfirmationModal';
+import ViewProgressModalContent from './Common/ViewProgressModalContent';
+import EditProgressModalContent from './Common/EditProgressModalContent';
+import ConfirmationModalContent from './Common/ConfirmationModalContent';
 import AlertDismissible from './Common/AlertDismissable';
 import { ProgressManagerProps } from 'types/props';
+import { CAL_DATE_FORMAT_OPS } from '../includes/consts';
 import {
     fetchData,
     replaceUrlPlaceholders,
@@ -29,18 +34,21 @@ import {
     URL_DELETE_PROGRESS,
 } from '../includes/paths';
 
+const MODAL_TYPES = {
+    VIEW: 'view',
+    CREATE: 'create',
+    EDIT: 'edit',
+    DELETE: 'delete',
+};
+type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
+
 /**
  * The main component for managing the progress entries related to a specific goal.
  */
 export default function ProgressManager(props: ProgressManagerProps): JSX.Element {
-    const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    };
-
     const [goal, setGoal] = useState<Goal | null>(null);
     const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
+    const [selectedEntry, setSelectedEntry] = useState<ProgressEntry | null>(null);
     const [progressTypes, setProgressTypes] = useState<ProgressType[]>([]);
     const [inputModel, setInputModel] = useState<ProgressEntryInputModel>({
         id: null,
@@ -51,13 +59,11 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         progressTypeId: null
     });
 
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
-    const [deleteConfirmationMsg, setDeleteConfirmationMsg] = useState<string | JSX.Element>('');
-
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
     const [progressLoading, setprogressLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [modalType, setModalType] = useState<ModalType>(MODAL_TYPES.CREATE);
 
     const stats = useMemo(
         () => calculateProgressStats(progressTypes, progressEntries),
@@ -66,7 +72,6 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
 
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
-    const handleCloseDeleteConfirmation = () => setShowDeleteConfirmation(false);
     const handleCloseErrorAlert = () => {
         setError(null);
     };
@@ -254,11 +259,12 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         resetInputModel();
     };
 
-    const handleAddProgressEntry = (): void => {
+    const handleCreate = (): void => {
         if (!goal) {
             throw new Error('Unable to add new progress entry. Goal is empty');
         }
 
+        setSelectedEntry(null);
         setInputModel({
             id: null,
             goalId: goal.id,
@@ -267,32 +273,55 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
             notes: null,
             progressTypeId: null
         });
+        setModalType(MODAL_TYPES.CREATE);
         handleShowModal();
     };
 
-    const handleEditProgressEntry = (entityId: number): void => {
-        const selectedEntry = progressEntries.find(e => e.id === entityId);
-        if (!selectedEntry) {
+    const handleEdit = (entityId: number): void => {
+        const target = progressEntries.find(e => e.id === entityId);
+        if (!target) {
             throw new Error(`Unable to edit entry. Could not find entry for id ${entityId}.`);
         }
 
+        setSelectedEntry({...target});
         setInputModel({
-            id: selectedEntry.id,
-            goalId: selectedEntry.progressType.goalId,
-            date: selectedEntry.date,
-            amount: selectedEntry.amount,
-            notes: selectedEntry.notes,
-            progressTypeId: selectedEntry.progressType.id
+            id: target.id,
+            goalId: target.progressType.goalId,
+            date: target.date,
+            amount: target.amount,
+            notes: target.notes,
+            progressTypeId: target.progressType.id
         });
+        setModalType(MODAL_TYPES.EDIT);
         handleShowModal();
     };
 
-    const handleDeleteProgressEntry = (entityId: number): void => {
-        const targetEntry = progressEntries.find(p => p.id === entityId);
-        if (!targetEntry) {
+    const handleView = (entityId: number): void => {
+        const target = progressEntries.find(e => e.id === entityId);
+        if (!target) {
+            throw new Error(`Unable to edit entry. Could not find entry for id ${entityId}.`);
+        }
+        setSelectedEntry({...target});
+        setInputModel({
+            id: target.id,
+            goalId: target.progressType.goalId,
+            date: target.date,
+            amount: target.amount,
+            notes: target.notes,
+            progressTypeId: target.progressType.id
+        });
+        setModalType(MODAL_TYPES.VIEW);
+        handleShowModal();
+    };
+
+    const handleDelete = (entityId: number): void => {
+        const target = progressEntries.find(p => p.id === entityId);
+        if (!target) {
             throw new Error(`Could not delete progress entry. No progress found for ID: ${entityId}`);
         }
 
+        setSelectedEntry({...target});
+        setModalType(MODAL_TYPES.DELETE);
         setInputModel({
             id: entityId,
             goalId: null,
@@ -301,29 +330,115 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
             notes: null,
             progressTypeId: null
         });
+        handleShowModal();
+    };
 
-        const msg = (
+    const deleteProgressMessage = (): JSX.Element => {
+        if (!selectedEntry) {
+            return (
+                <p className='text-danger'>Oops! Something went wrong. No progress has been selected.</p>
+            );
+        }
+
+        return (
             <React.Fragment>
                 <p>Are you sure you want to delete this progress?</p>
                 <ul>
                     <li>
-                        <strong>Date:</strong> {targetEntry.date.toLocaleDateString('en-US', DATE_FORMAT_OPS)}
+                        <strong>Date:</strong> {selectedEntry.date.toLocaleDateString('en-US', CAL_DATE_FORMAT_OPS)}
                     </li>
                     <li>
-                        <strong>Type:</strong> {targetEntry.progressType.name}
+                        <strong>Type:</strong> {selectedEntry.progressType.name}
                     </li>
                     <li>
-                        <strong>Amount:</strong> {targetEntry.amount}
+                        <strong>Amount:</strong> {selectedEntry.amount}
                     </li>
                     <li>
-                        <strong>Notes:</strong> {targetEntry.notes}
+                        <strong>Notes:</strong> {selectedEntry.notes}
                     </li>
                 </ul>
             </React.Fragment>
         );
+    };
 
-        setDeleteConfirmationMsg(msg);
-        setShowDeleteConfirmation(true);
+    const getModalContent = (): JSX.Element => {
+        if (modalType !== MODAL_TYPES.CREATE && !selectedEntry) {
+            throw new Error(`Unable to edit entry. No entry selected`);
+        }
+
+        let content: JSX.Element;
+        switch (modalType) {
+            case MODAL_TYPES.VIEW:
+                content = (
+                    <ViewProgressModalContent
+                        show={showModal}
+                        entry={selectedEntry!}
+                        handleEdit={handleEdit}
+                        handleDelete={handleDelete}
+                        handleShow={handleShowModal}
+                        handleClose={handleCloseModal}
+                    ></ViewProgressModalContent>
+                );
+                break;
+            case MODAL_TYPES.CREATE:
+                content = (
+                    <EditProgressModalContent
+                        show={showModal}
+                        inputModel={inputModel}
+                        progressTypes={progressTypes}
+                        setInputModel={setInputModel}
+                        handleShow={handleShowModal}
+                        handleClose={handleCloseModal}
+                        handleSaveProgress={handleSaveProgress}
+                    ></EditProgressModalContent>
+                );
+                break;
+            case MODAL_TYPES.EDIT:
+                content = (
+                    <EditProgressModalContent
+                        show={showModal}
+                        inputModel={inputModel}
+                        progressTypes={progressTypes}
+                        setInputModel={setInputModel}
+                        handleShow={handleShowModal}
+                        handleClose={handleCloseModal}
+                        handleSaveProgress={handleSaveProgress}
+                    ></EditProgressModalContent>
+                );
+                break;
+            case MODAL_TYPES.DELETE:
+                content = (
+                    <ConfirmationModalContent
+                        show={showModal}
+                        title={'Delete Progress'}
+                        message={deleteProgressMessage()}
+                        confirmClass={'danger'}
+                        confirmBtnText={'Delete'}
+                        inputModel={inputModel}
+                        handleConfirm={deleteProgress}
+                        handleClose={handleCloseModal}
+                    ></ConfirmationModalContent>
+                );
+                break;
+            default:
+                content = (
+                    <React.Fragment>
+                        <Modal.Header closeButton>
+                            <Modal.Title className="d-flex flex-row justify-content-between">
+                                No Progress Selected
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p className="text-danger">Oops! It looks like something has gone wrong.</p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            (<Button variant='secondary' onClick={handleCloseModal}>Close</Button>)
+                        </Modal.Footer>
+                    </React.Fragment>
+                );
+        }
+
+        return content;
     };
 
     const resetInputModel = (): void => {
@@ -357,10 +472,10 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                     entries={progressEntries}
                     goalLoading={goalLoading}
                     progressLoading={progressLoading}
-                    handleView={null}
-                    handleCreate={handleAddProgressEntry}
-                    handleEdit={handleEditProgressEntry}
-                    handleDelete={handleDeleteProgressEntry}
+                    handleView={handleView}
+                    handleCreate={handleCreate}
+                    handleEdit={handleEdit}
+                    handleDelete={handleDelete}
                 ></props.control>
                 <SummarySidebar
                     goal={goal}
@@ -369,23 +484,11 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
             </div>
             <ProgressModal
                 show={showModal}
-                inputModel={inputModel}
-                setInputModel={setInputModel}
-                progressTypes={progressTypes}
                 handleShow={handleShowModal}
                 handleClose={handleCloseModal}
-                handleSaveProgress={handleSaveProgress}
-            ></ProgressModal>
-            <ConfirmationModal
-                show={showDeleteConfirmation}
-                title={'Delete Progress'}
-                message={deleteConfirmationMsg}
-                confirmBtnText={'Delete'}
-                confirmClass={'danger'}
-                inputModel={inputModel}
-                handleConfirm={deleteProgress}
-                handleClose={handleCloseDeleteConfirmation}
-            ></ConfirmationModal>
+                content={getModalContent()}
+            >
+            </ProgressModal>
         </React.Fragment>
     );
 }

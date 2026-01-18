@@ -138,6 +138,10 @@ a.col-sort-link {
     border-left: .3em solid transparent;
 }
 
+.modal-content .view-controls {
+    height: min-content;
+}
+
 // Progress Calendar
 .calendar-wrapper {
     width: 100%;
@@ -206,7 +210,34 @@ $calendar-item-padding: .2rem .5rem;
     &:nth-child(7n + 8) {
         border-left: $border-main;
     }
-    
+
+    &:hover {
+        .calendar-add-btn {
+            opacity: 1;
+        }
+    }
+
+    .calendar-add-btn {
+        opacity: .2;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 90%;
+        padding: .25rem;
+        border-radius: 2rem;
+        border: 1px solid $sl-primary-lighter;
+        transition: opacity .5s ease-out;
+
+        &:hover {
+            background-color: $sl-grey-darker;
+            border-color: $sl-primary-light;
+        }
+    }
+
+    .label-row {
+        position: relative;
+    }
+
     .calendar-day-label {
         display: flex;
         justify-content: center;
@@ -225,7 +256,33 @@ $calendar-item-padding: .2rem .5rem;
         }
     }
 
-    .progress-entry {
-        font-size: 90%;
+    .calendar-day-body {
+        padding: .25rem;
+    }
+
+    .calendar-entry {
+        @each $i, $vals in $cal-item-styles {
+            &.cal-entry-color-#{$i} {
+                font-size: 90%;
+                text-decoration: none;
+                padding: .2rem .5rem;
+                border-radius: .25rem;
+                background-color: map-get($vals, bg);
+                border: map-get($vals, border);
+                color: map-get($vals, color);
+
+                &:hover {
+                    background-color: map-get($vals, hover-bg);
+                }
+            }
+        }
+
+        &.dropdown-toggle::after {
+            display: flex;
+            margin-left: 0;
+            content: none;
+            vertical-align: 0;
+            border: none;
+        }
     }
 }

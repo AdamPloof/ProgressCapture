@@ -1,16 +1,13 @@
-import { JSX } from 'react';
+import React, { JSX } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { ConfirmationModalProps } from 'types/props';
 
-export default function ConfirmationModal(props: ConfirmationModalProps): JSX.Element {
+export default function ConfirmationModalContent(props: ConfirmationModalProps): JSX.Element {
     const confirmClass = props.confirmClass ?? 'primary';
 
     return (
-        <Modal
-            show={props.show}
-            onHide={props.handleClose}
-        >
+        <React.Fragment>
             <Modal.Header closeButton>
                 <Modal.Title>{props.title}</Modal.Title>
             </Modal.Header>
@@ -28,6 +25,6 @@ export default function ConfirmationModal(props: ConfirmationModalProps): JSX.El
                     props.handleClose();
                 }}>{props.confirmBtnText ?? 'Save'}</Button>
             </Modal.Footer>
-        </Modal>
+        </React.Fragment>
     );
 }

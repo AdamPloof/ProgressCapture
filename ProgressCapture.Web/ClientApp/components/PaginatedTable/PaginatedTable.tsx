@@ -3,7 +3,7 @@ import { Pagination } from 'react-bootstrap';
 import TableRowOptions from './TableRowOptions';
 import { PaginatedTableProps, SortOrder, Identifiable } from 'types/props';
 import { titleCase } from '../../includes/utils';
-import { DEFAULT_PAGE_SIZE } from '../../includes/consts';
+import { DEFAULT_PAGE_SIZE, CAL_DATE_FORMAT_OPS } from '../../includes/consts';
 
 interface Page {
     key: string;
@@ -20,12 +20,6 @@ interface Page {
 export default function PaginatedTable<T extends Identifiable>(
     props: PaginatedTableProps<T>
 ): JSX.Element {
-    const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    };
-
     const [currentPage, setCurrentPage] = useState<number>(0); // 0 indexed
     const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
 
@@ -128,7 +122,7 @@ export default function PaginatedTable<T extends Identifiable>(
         if (val === null) {
             return '';
         } else if (val instanceof Date) {
-            return val.toLocaleDateString('en-US', DATE_FORMAT_OPS);
+            return val.toLocaleDateString('en-US', CAL_DATE_FORMAT_OPS);
         } else if (typeof val === 'boolean') {
             return val ? 'True' : 'False';
         } else {

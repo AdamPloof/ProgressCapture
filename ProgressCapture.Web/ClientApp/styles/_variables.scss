@@ -78,3 +78,13 @@ $sl-danger-lightest: #f7cfc5;
 
 $library-widget-max-height: 800px;
 $border-main: 1px solid $sl-grey-light;
+
+// Calendar item colors
+$cal-item-styles: (
+    1: (bg: #4E56C0, border: 1px solid #3d439e, color: #e3e5ff, hover-bg: #3f4591),
+    2: (bg: #8156b2, border: 1px solid #834dc0, color: #e7dcf5, hover-bg: #7d4db3),
+    3: (bg: #f2ccff, border: 1px solid #be86cf, color: #3c2145, hover-bg: #f8e4ff),
+    4: (bg: #FDCFFA, border: 1px solid #ce89ca, color: #432141, hover-bg: #eee1ed),
+    5: (bg: #cffdeb, border: 1px solid #b0e3d0, color: #1e382e, hover-bg: #e8f4ef),
+    6: (bg: #cfeefd, border: 1px solid #a4c8da, color: #233138, hover-bg: #f1f7fa),
+);
