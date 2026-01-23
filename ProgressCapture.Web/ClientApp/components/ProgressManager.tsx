@@ -139,6 +139,22 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         }
     };
 
+    const handleChangeSelectedGoal = (goal: Goal): void => {
+        if (selectedGoal && goal.id === selectedGoal.id) {
+            return;
+        }
+
+        setSelectedGoal(goal);
+    }
+
+    const handleChangeControlType = (type: ControlType): void => {
+        if (type === controlType) {
+            return;
+        }
+
+        setControlType(type);
+    };
+
     const handleSaveProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
         try {
             if (progressInput.id === null) {
@@ -513,7 +529,12 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     return (
         <div className="app-layout">
             <header>
-                <Navbar></Navbar>
+                <Navbar
+                    goals={goals}
+                    activeControl={controlType}
+                    handleChangeControlType={handleChangeControlType}
+                    handleChangeGoal={handleChangeSelectedGoal}
+                ></Navbar>
             </header>
 
             <div className="container-fluid d-flex flex-column flex-grow-1">

@@ -8,3 +8,4 @@ export const URL_ADD_PROGRESS = base + "api/progress/add";
 export const URL_UPDATE_PROGRESS = base + "api/progress/update/{id}";
 export const URL_DELETE_PROGRESS = base + "api/progress/delete/{id}";
 export const URL_EDIT_GOAL = base + "goal/edit/{id}";
+export const URL_IMPORT_PROGRESS = base + "progress/upload";

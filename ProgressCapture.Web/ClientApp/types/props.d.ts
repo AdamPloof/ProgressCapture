@@ -8,6 +8,13 @@ import {
 
 export type ControlType = 'calendar' | 'list';
 
+export interface NavbarProps {
+    goals: Goal[];
+    activeControl: ControlType;
+    handleChangeGoal(goal: Goal): void;
+    handleChangeControlType(controlType: ControlType): void;
+}
+
 export interface ProgressModalProps {
     show: boolean;
     handleShow(): void;

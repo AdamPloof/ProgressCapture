@@ -44,6 +44,14 @@
     }
 }
 
+.navbar-center {
+    @include media-breakpoint-up(md) {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
 // Sidebar
 .sl-sidebar {
     min-width: 200px;

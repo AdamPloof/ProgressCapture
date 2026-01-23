@@ -1,14 +1,27 @@
 import { JSX, useState } from 'react';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Goal } from '../../types/entities';
+import { NavbarProps } from '../../types/props';
+import { URL_IMPORT_PROGRESS } from '../../includes/paths';
+import { titleCase } from '../../includes/utils';
 
-export default function Navbar(): JSX.Element {
+export default function Navbar(props: NavbarProps): JSX.Element {
     const [goals, setGoals] = useState<Goal[]>([]);
 
     const goalsDropdown = (): JSX.Element => {
         return (
             <NavDropdown title="Goals">
-                <NavDropdown.Item>Something</NavDropdown.Item>
+                {props.goals.map(g => {
+                    return (
+                        <NavDropdown.Item
+                            key={`nav_itemt_${g.id}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                props.handleChangeGoal(g);
+                            }}
+                        >{titleCase(g.name)}</NavDropdown.Item>
+                    );
+                })}
             </NavDropdown>
         );
     };
@@ -21,17 +34,45 @@ export default function Navbar(): JSX.Element {
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
+
                 <div className="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul className="navbar-nav flex-grow-1">
+                    {/* Nav left */}
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         {goalsDropdown()}
                         <li className="nav-item">
-                            <a className="nav-link" asp-route="Home">List</a>
+                            <a
+                                className="nav-link"
+                                href={URL_IMPORT_PROGRESS}
+                            >Upload</a>
+                        </li>
+                    </ul>
+                    {/* Nav middle */}
+                    <ul className="navbar-nav navbar-center mb-2 mb-lg-0">
+                        <li className="nav-item">
+                            <a
+                                className={props.activeControl === 'calendar' ? 'nav-link active' : 'nav-link'}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    props.handleChangeControlType('calendar');
+                                }}
+                            >Calendar</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" asp-route="Home">Calendar</a>
+                            <a
+                                className={props.activeControl === 'list' ? 'nav-link active' : 'nav-link'}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    props.handleChangeControlType('list');
+                                }}
+                            >List</a>
                         </li>
+                    </ul>
+                    {/* Nav right */}
+                    <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <a className="nav-link" asp-route="upload-progress">Upload</a>
+                            <a href="#" className='nav-link'>Login</a>
                         </li>
                     </ul>
                 </div>
