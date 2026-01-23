@@ -23,6 +23,14 @@ export function goalTransformer(data: any): Goal {
     return goal;
 }
 
+export function goalsTransformer(data: any): Goal[] {
+    if (!Array.isArray(data)) {
+        throw new Error('Could not parse goals data. Data is not array.');
+    }
+
+    return data.map(d => goalTransformer(d));
+}
+
 export function progressEntriesTransformer(data: any): ProgressEntry[] {
     const entries: ProgressEntry[] = [];
     for (const d of data) {

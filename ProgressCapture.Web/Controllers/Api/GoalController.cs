@@ -17,10 +17,17 @@ public class GoalController : ControllerBase {
     }
 
     [HttpGet("{goalId}")]
-    public async Task<IActionResult> Info(int goalId) {
+    public async Task<IActionResult> GetGoal(int goalId) {
         Goal? goal = await _context.Goals.FindAsync(goalId) ?? null;
 
         return Ok(goal);
+    }
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetGoalsForUser() {
+        IEnumerable<Goal> goals = await _context.Goals.ToListAsync();
+
+        return Ok(goals);
     }
 
     [HttpGet("{goalId}/progress-types")]

@@ -16,34 +16,6 @@ public class GoalController : Controller {
         _context = context;
     }
 
-    [HttpGet("table/{goalId}", Name = "GoalTable")]
-    public async Task<IActionResult> Table(int goalId) {
-        Goal? goal = await _context.Goals.FindAsync(goalId);
-        if (goal == null) {
-            return NotFound();
-        }
-
-        return View(new GoalViewModel() {
-            Id = goal.Id,
-            Name = goal.Name,
-            Description = goal.Description
-        });
-    }
-
-    [HttpGet("calendar/{goalId}", Name = "GoalCalendar")]
-    public async Task<IActionResult> Calendar(int goalId) {
-        Goal? goal = await _context.Goals.FindAsync(goalId);
-        if (goal == null) {
-            return NotFound();
-        }
-
-        return View(new GoalViewModel() {
-            Id = goal.Id,
-            Name = goal.Name,
-            Description = goal.Description
-        });
-    }
-
     [HttpGet("list", Name = "ListGoals")]
     public async Task<IActionResult> List() {
         List<GoalViewModel> goals = await _context.Goals.Select(g =>

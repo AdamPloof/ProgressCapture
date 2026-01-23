@@ -211,12 +211,6 @@ $calendar-item-padding: .2rem .5rem;
         border-left: $border-main;
     }
 
-    &:hover {
-        .calendar-add-btn {
-            opacity: 1;
-        }
-    }
-
     .calendar-add-btn {
         opacity: .2;
         position: absolute;
@@ -229,6 +223,7 @@ $calendar-item-padding: .2rem .5rem;
         transition: opacity .5s ease-out;
 
         &:hover {
+            opacity: 1;
             background-color: $sl-grey-darker;
             border-color: $sl-primary-light;
         }

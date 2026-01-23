@@ -1,13 +1,16 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
 import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal';
+import ProgressTable from './ProgressTable/ProgressTable';
+import ProgressCalendar from './ProgressCalendar/ProgressCalendar';
+import Navbar from './Common/Navbar';
 import SummarySidebar from './Common/SummarySidebar';
+import Modal from 'react-bootstrap/Modal';
 import ProgressModal from './Common/ProgressModal';
 import ViewProgressModalContent from './Common/ViewProgressModalContent';
 import EditProgressModalContent from './Common/EditProgressModalContent';
 import ConfirmationModalContent from './Common/ConfirmationModalContent';
 import AlertDismissible from './Common/AlertDismissable';
-import { ProgressManagerProps } from 'types/props';
+import { ControlType, ProgressManagerProps } from 'types/props';
 import { CAL_DATE_FORMAT_OPS } from '../includes/consts';
 import {
     fetchData,
@@ -21,12 +24,12 @@ import {
     ProgressEntryInputModel,
 } from '../types/entities';
 import {
-    goalTransformer,
+    goalsTransformer,
     progressEntriesTransformer,
     progressTypeTransformer
 } from '../includes/transformers';
 import {
-    URL_GOAL,
+    URL_GOALS,
     URL_GOAL_PROGRESS,
     URL_GOAL_PROGRESS_TYPES,
     URL_ADD_PROGRESS,
@@ -39,14 +42,15 @@ const MODAL_TYPES = {
     CREATE: 'create',
     EDIT: 'edit',
     DELETE: 'delete',
-};
+} as const;
 type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
 
 /**
  * The main component for managing the progress entries related to a specific goal.
  */
 export default function ProgressManager(props: ProgressManagerProps): JSX.Element {
-    const [goal, setGoal] = useState<Goal | null>(null);
+    const [goals, setGoals] = useState<Goal[]>([]);
+    const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
     const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
     const [selectedEntry, setSelectedEntry] = useState<ProgressEntry | null>(null);
     const [progressTypes, setProgressTypes] = useState<ProgressType[]>([]);
@@ -59,6 +63,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         progressTypeId: null
     });
 
+    const [controlType, setControlType] = useState<ControlType>(props.controlType);
     const [goalLoading, setGoalLoading] = useState<boolean>(false);
     const [progressLoading, setprogressLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -77,17 +82,26 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     };
 
     useEffect(() => {
-        fetchGoal();
+        fetchGoals();
         fetchProgressEntries();
         fetchProgressTypes();
     }, []);
 
-    const fetchGoal = async (): Promise<void> => {
+    const fetchGoals = async (): Promise<void> => {
         setGoalLoading(true);
         try {
-            const url = replaceUrlPlaceholders(URL_GOAL, [String(props.goalId)]);
-            const goal = await fetchData(url, goalTransformer);
-            setGoal(goal);
+            const url = replaceUrlPlaceholders(URL_GOALS, [String(props.goalId)]);
+            const userGoals = await fetchData(url, goalsTransformer);
+            setGoals(userGoals);
+            if (selectedGoal === null) {
+                const defaultGoal: Goal | undefined = userGoals.find(g => g.id === props.goalId);
+                if (!defaultGoal) {
+                    throw new Error(`Default goal ID ${props.goalId} could not be found in user goals`);
+                }
+
+                setSelectedGoal(defaultGoal);
+            }
+
             setGoalLoading(false);
         } catch (err) {
             if (err instanceof Error) {
@@ -140,7 +154,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     };
 
     const addProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
-        if (!goal) {
+        if (!selectedGoal) {
             throw new Error('Unable to submit progress entry. Goal is undefined');
         }
 
@@ -184,7 +198,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     };
 
     const updateProgress = async (progressInput: ProgressEntryInputModel): Promise<void> => {
-        if (!goal) {
+        if (!selectedGoal) {
             throw new Error('Unable to submit progress entry. Goal is undefined');
         }
 
@@ -260,14 +274,14 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     };
 
     const handleCreate = (): void => {
-        if (!goal) {
+        if (!selectedGoal) {
             throw new Error('Unable to add new progress entry. Goal is empty');
         }
 
         setSelectedEntry(null);
         setInputModel({
             id: null,
-            goalId: goal.id,
+            goalId: selectedGoal.id,
             date: null,
             amount: 0,
             notes: null,
@@ -463,32 +477,72 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         );
     };
 
+    const progressControl = (): JSX.Element => {
+        switch (controlType) {
+            case 'list':
+                return (
+                    <ProgressTable
+                        goal={selectedGoal}
+                        entries={progressEntries}
+                        goalLoading={goalLoading}
+                        progressLoading={progressLoading}
+                        handleView={handleView}
+                        handleCreate={handleCreate}
+                        handleEdit={handleEdit}
+                        handleDelete={handleDelete}
+                    ></ProgressTable>
+                );
+            case 'calendar':
+                return (
+                    <ProgressCalendar
+                        goal={selectedGoal}
+                        entries={progressEntries}
+                        goalLoading={goalLoading}
+                        progressLoading={progressLoading}
+                        handleView={handleView}
+                        handleCreate={handleCreate}
+                        handleEdit={handleEdit}
+                        handleDelete={handleDelete}
+                    ></ProgressCalendar>
+                );
+            default:
+                throw new Error(`Invalid controlType. Expected 'calendar' or 'list', got: ${controlType}`);
+        }
+    };
+
     return (
-        <React.Fragment>
-            {error ? errorAlert() : null}
-            <div className="content-wrapper d-flex flex-row justify-content-between">
-                <props.control
-                    goal={goal}
-                    entries={progressEntries}
-                    goalLoading={goalLoading}
-                    progressLoading={progressLoading}
-                    handleView={handleView}
-                    handleCreate={handleCreate}
-                    handleEdit={handleEdit}
-                    handleDelete={handleDelete}
-                ></props.control>
-                <SummarySidebar
-                    goal={goal}
-                    stats={stats}
-                ></SummarySidebar>
+        <div className="app-layout">
+            <header>
+                <Navbar></Navbar>
+            </header>
+
+            <div className="container-fluid d-flex flex-column flex-grow-1">
+                {/* Flash Message */}
+
+                <main role="main" className="d-flex flex-column flex-grow-1 pb-3">
+                    {error ? errorAlert() : null}
+                    <div className="content-wrapper d-flex flex-row justify-content-between">
+                        {progressControl()}
+                        <SummarySidebar
+                            goal={selectedGoal}
+                            stats={stats}
+                        ></SummarySidebar>
+                    </div>
+                </main>
             </div>
+
+            <footer className="border-top footer text-muted">
+                <div className="container">
+                    &copy; 2025 - ProgressCapture.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+            </footer>
+
             <ProgressModal
                 show={showModal}
                 handleShow={handleShowModal}
                 handleClose={handleCloseModal}
                 content={getModalContent()}
-            >
-            </ProgressModal>
-        </React.Fragment>
+            ></ProgressModal>
+        </div>
     );
 }

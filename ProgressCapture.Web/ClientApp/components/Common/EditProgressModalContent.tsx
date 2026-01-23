@@ -93,7 +93,7 @@ export default function EditProgressModalContent(props: EditProgressModalProps):
                                 props.setInputModel(newModel);
                             }}
                         >
-                            <option disabled value="">Select progress type...</option>
+                            <option disabled value="">Select type...</option>
                             {props.progressTypes.map(t => {
                                 return (
                                     <option

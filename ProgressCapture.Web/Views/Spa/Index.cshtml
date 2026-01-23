@@ -1,9 +1,9 @@
 @using ProgressCapture.Web.ViewModels
-@model GoalViewModel
+@model SpaRootViewModel
 
 <div
     id="pc-root-container"
     class="d-flex flex-column flex-grow-1"
-    data-control-type="ProgressCalendar"
-    data-entity-id="@Model.Id"
+    data-control-type="@Model.ControlType"
+    data-entity-id="@Model.DefaultGoalId"
 ></div>

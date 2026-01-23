@@ -6,9 +6,7 @@ import {
     ProgressStat
 } from "./entities";
 
-export interface WidgetProps {
-    entityId: number | null; // The ID of the base entity for a component
-}
+export type ControlType = 'calendar' | 'list';
 
 export interface ProgressModalProps {
     show: boolean;
@@ -72,7 +70,7 @@ export interface GoalSummaryProps {
  */
 export interface ProgressManagerProps {
     goalId: number;
-    control: ProgressControl;
+    controlType: ComponentType;
 }
 
 /**

@@ -1,0 +1,23 @@
+@using ProgressCapture.Web.Extensions
+@using ProgressCapture.Web.ViewModels;
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ProgressCapture</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/dist/bundle.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProgressCapture.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    @RenderBody()
+
+    <script src="~/dist/bundle.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
