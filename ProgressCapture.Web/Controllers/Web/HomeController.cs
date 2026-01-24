@@ -14,7 +14,7 @@ public class HomeController : Controller {
 
     [Route("/", Name = "Home")]
     public IActionResult Index() {
-        return View();
+        return RedirectToRoute("App");
     }
 
     [Route("/privacy", Name = "Privacy")]

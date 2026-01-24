@@ -88,6 +88,14 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         fetchProgressTypes();
     }, []);
 
+    useEffect(() => {
+        const {pathname, search, hash} = window.location;
+        let newPath = pathname.replace(/\/\d+$/, '') + (selectedGoal ? `/${selectedGoal.id}` : '');
+        newPath += search + hash;
+        history.pushState({goalId: selectedGoal ? selectedGoal.id : null}, '', newPath);
+        /** @todo: handle popState events so that when user hits back button we go to previous goal */
+    }, [selectedGoal]);
+
     const fetchGoals = async (): Promise<void> => {
         setGoalLoading(true);
         try {

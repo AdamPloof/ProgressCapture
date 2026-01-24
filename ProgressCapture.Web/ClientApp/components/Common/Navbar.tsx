@@ -1,14 +1,11 @@
-import { JSX, useState } from 'react';
+import { JSX } from 'react';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { Goal } from '../../types/entities';
 import { NavbarProps, ControlType } from '../../types/props';
 import { CONTROL_TYPES } from '../../includes/consts';
-import { URL_IMPORT_PROGRESS } from '../../includes/paths';
+import { URL_IMPORT_PROGRESS, URL_NEW_GOAL } from '../../includes/paths';
 import { titleCase } from '../../includes/utils';
 
 export default function Navbar(props: NavbarProps): JSX.Element {
-    const [goals, setGoals] = useState<Goal[]>([]);
-
     const goalsDropdown = (): JSX.Element => {
         return (
             <NavDropdown title="Goals">
@@ -23,6 +20,10 @@ export default function Navbar(props: NavbarProps): JSX.Element {
                         >{titleCase(g.name)}</NavDropdown.Item>
                     );
                 })}
+                <NavDropdown.Divider />
+                <NavDropdown.Item href={URL_NEW_GOAL}>
+                    New Goal
+                </NavDropdown.Item>
             </NavDropdown>
         );
     };
@@ -38,7 +39,11 @@ export default function Navbar(props: NavbarProps): JSX.Element {
     return (
         <nav className="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
             <div className="container-fluid">
-                <a className="navbar-brand" href='#'>Progress Capture</a>
+                <a
+                    className="navbar-brand"
+                    href='#'
+                    onClick={e => { e.preventDefault(); }}
+                >Progress Capture</a>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
