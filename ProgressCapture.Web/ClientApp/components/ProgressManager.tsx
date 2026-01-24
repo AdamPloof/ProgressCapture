@@ -290,7 +290,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         resetInputModel();
     };
 
-    const handleCreate = (): void => {
+    const handleCreate = (defaultDate: Date | null = null): void => {
         if (!selectedGoal) {
             throw new Error('Unable to add new progress entry. Goal is empty');
         }
@@ -299,7 +299,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         setInputModel({
             id: null,
             goalId: selectedGoal.id,
-            date: null,
+            date: defaultDate,
             amount: 0,
             notes: null,
             progressTypeId: null

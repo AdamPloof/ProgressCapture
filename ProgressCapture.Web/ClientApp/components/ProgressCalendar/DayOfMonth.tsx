@@ -26,7 +26,7 @@ export default function DayOfMonth(props: CalendarDayProps): JSX.Element {
                 className='calendar-add-btn'
                 onClick={e => {
                     e.preventDefault();
-                    props.handleCreate();
+                    props.handleCreate(props.date);
                 }}
             >
                 <img src={`${URL_IMAGE_ROOT}/icons/add_dark.svg`} alt="Add progress" />

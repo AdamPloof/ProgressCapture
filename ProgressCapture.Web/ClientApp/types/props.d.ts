@@ -111,7 +111,7 @@ export type ProgressControl = (props: ProgressControlProps) => JSX.Element;
 /**
  * Callback for creating a new entity from ProgressControl
  */
-export type HandleCreateFunc = () => void;
+export type HandleCreateFunc = (defaultDate: Date | null = null) => void;
 
 /**
  * Callback for viewing an entity from a ProgressControl

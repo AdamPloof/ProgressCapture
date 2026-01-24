@@ -26,7 +26,7 @@ export default function DayOfWeek(props: CalendarDayProps): JSX.Element {
         }
 
         return (
-            <React.Fragment>
+            <React.Fragment key={`entry_${entry.id}`}>
                 <a
                     key={`cal_entry_${entry.id}`}
                     href="#"
@@ -66,7 +66,7 @@ export default function DayOfWeek(props: CalendarDayProps): JSX.Element {
                         className='calendar-add-btn'
                         onClick={e => {
                             e.preventDefault();
-                            props.handleCreate();
+                            props.handleCreate(props.date);
                         }}
                     >
                         <img src={`${URL_IMAGE_ROOT}/icons/add_dark.svg`} alt="Add progress" />

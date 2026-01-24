@@ -9,12 +9,6 @@ import { ProgressEntryTableRow } from '../../types/entities';
  * The main component for managing the progress entries related to a specific goal.
  */
 export default function ProgressTable(props: ProgressControlProps): JSX.Element {
-    const DATE_FORMAT_OPS: Intl.DateTimeFormatOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    };
-
     const progressTable = (): JSX.Element => {
         if (props.progressLoading) {
             return <Loader />;
@@ -59,7 +53,10 @@ export default function ProgressTable(props: ProgressControlProps): JSX.Element 
                 <div className="header-tools d-flex justify-content-end">
                     <button
                         className='btn btn-primary'
-                        onClick={props.handleCreate ? props.handleCreate: () => { console.error('No add handler set'); }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            props.handleCreate();
+                        }}
                     >
                         Add Progress
                     </button>

@@ -186,10 +186,10 @@ export default function PaginatedTable<T extends Identifiable>(
                     }}
                 />
 
-                {pages.map(p => {
+                {pages.map((p, idx) => {
                     if (p.key.startsWith('ellipses')) {
                         return (
-                            <Pagination.Ellipsis />
+                            <Pagination.Ellipsis key={`ellipses_${idx}`} />
                         );
                     }
 
