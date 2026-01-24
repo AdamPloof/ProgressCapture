@@ -1,20 +1,20 @@
-import React, { JSX, useState, useMemo } from 'react';
-import DayOfMonth from './DayOfMonth';
-import { ProgressControlProps } from 'types/props';
+import { JSX, useState, useMemo } from 'react';
+import DayOfWeek from './DayOfWeek';
 import { ProgressEntry } from 'types/entities';
-import { longMonthName, formatDateYmd } from '../../includes/utils';
+import { ProgressControlProps } from 'types/props';
+import { getSundayOfCurrentWeek, formatDateYmd, longMonthName } from '../../includes/utils';
 import { URL_IMAGE_ROOT } from '../../includes/paths';
 
-// TODO: make a color generator that can handle unlimited number of progress types
-const MAX_ENTRY_TYPES = 6;
+export default function WeekCalendar(props: ProgressControlProps): JSX.Element {
+    const MIN_EMPTY_CELLS = 1;
+    const MAX_EMPTY_CELLS = 5;
 
-export default function ProgressCalendar(props: ProgressControlProps): JSX.Element {
-    // currentMonth is 0 indexed: jan == 0, dec == 11
-    const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
-    const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+    const [startOfWeek, setStartOfWeek] = useState<Date>(() => getSundayOfCurrentWeek());
 
     /**
      * Map of progress type ID to calendar item color index
+     * 
+     * @todo: move to manager
      */
     const progressTypeColorMap: Map<number, number> = useMemo(() => {
         const colorMap = new Map<number, number>();
@@ -49,20 +49,17 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
         }
 
         return entryMap;
-    }, [props.entries, currentMonth, currentYear]);
+    }, [props.entries, startOfWeek]);
 
     const getDates = (): Date[] => {
-        const firstOfMonth = new Date(currentYear, currentMonth, 1);
-        const firstOfCalendar = new Date(firstOfMonth);
-        firstOfCalendar.setDate(firstOfMonth.getDate() - firstOfMonth.getDay());
         console.assert(
-            firstOfCalendar.getDay() === 0,
+            startOfWeek.getDay() === 0,
             "First day of calendar should always be a Sunday"
         );
 
-        const dates: Date[] = [firstOfCalendar];
-        for (let i = 1; i < 35; i++) {
-            const nextDate = new Date(firstOfCalendar);
+        const dates: Date[] = [startOfWeek];
+        for (let i = 1; i < 7; i++) {
+            const nextDate = new Date(startOfWeek);
             nextDate.setDate(nextDate.getDate() + i);
             dates.push(nextDate);
         }
@@ -70,7 +67,7 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
         return dates;
     };
 
-    const monthSelect = (): JSX.Element => {
+    const weekSelect = (): JSX.Element => {
         return (
             <div className="date-select-control d-flex flex-row flex-shrink-1">
                 <button
@@ -78,8 +75,7 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                     onClick={(e) => {
                         e.preventDefault();
                         const today = new Date();
-                        setCurrentYear(today.getFullYear());
-                        setCurrentMonth(today.getMonth());
+                        setStartOfWeek(getSundayOfCurrentWeek());
                     }}
                 >
                     Today
@@ -88,12 +84,9 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                     className="btn btn-outline-secondary me-2"
                     onClick={(e) => {
                         e.preventDefault();
-                        if (currentMonth === 0) {
-                            setCurrentMonth(11);
-                            setCurrentYear(currentYear - 1);
-                        } else {
-                            setCurrentMonth(currentMonth - 1);
-                        }
+                        const prevSunday = new Date(startOfWeek);
+                        prevSunday.setDate(startOfWeek.getDate() - 7);
+                        setStartOfWeek(prevSunday);
                     }}
                 >
                     <img src={`${URL_IMAGE_ROOT}/icons/backward_dark.svg`} alt="Previous month" />
@@ -102,12 +95,9 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                     className="btn btn-outline-secondary"
                     onClick={(e) => {
                         e.preventDefault();
-                        if (currentMonth === 11) {
-                            setCurrentMonth(0);
-                            setCurrentYear(currentYear + 1);
-                        } else {
-                            setCurrentMonth(currentMonth + 1);
-                        }
+                        const nextSunday = new Date(startOfWeek);
+                        nextSunday.setDate(startOfWeek.getDate() + 7);
+                        setStartOfWeek(nextSunday);
                     }}
                 >
                     <img src={`${URL_IMAGE_ROOT}/icons/forward_dark.svg`} alt="Next month" />
@@ -132,10 +122,10 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                 <div className="header-info d-flex align-items-end">
                     <h3 className='mb-0'>{props.goal ? props.goal.name : '...'}</h3>
                 </div>
-                {monthSelect()}
+                {weekSelect()}
                 <div className="header-tools d-flex justify-content-end align-items-end">
                     <h4 className='mb-0'>
-                        {longMonthName(new Date(currentYear, currentMonth, 1))} {currentYear}
+                        {longMonthName(new Date(startOfWeek))} {startOfWeek.getFullYear()}
                     </h4>
                 </div>
             </div>
@@ -143,22 +133,13 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
     }
 
     return (
-        <div className="progress-manager d-flex flex-column flex-1 container border">
+        <div className="progress-manager d-flex flex-column flex-1 container border pb-2">
             {widgetHeader()}
             <div className="calendar-wrapper">
                 <div className="progress-calendar">
-                    <div className="calendar-weekdays">
-                        <div className="weekday-label">SUN</div>
-                        <div className="weekday-label">MON</div>
-                        <div className="weekday-label">TUE</div>
-                        <div className="weekday-label">WED</div>
-                        <div className="weekday-label">THU</div>
-                        <div className="weekday-label">FRI</div>
-                        <div className="weekday-label">SAT</div>
-                    </div>
-                    <div className="calendar-body">
+                    <div className="week-calendar-body">
                         {getDates().map(
-                            d => <DayOfMonth
+                            d => <DayOfWeek
                                 key={d.getTime()}
                                 date={d}
                                 handleCreate={props.handleCreate}
@@ -167,8 +148,8 @@ export default function ProgressCalendar(props: ProgressControlProps): JSX.Eleme
                                 handleDelete={props.handleDelete}
                                 progressEntries={dailyEntries.get(formatDateYmd(d)) ?? []}
                                 progressTypeColorMap={progressTypeColorMap}
-                                inCurrentMonth={d.getMonth() === currentMonth}
-                            ></DayOfMonth>
+                                inCurrentMonth={true}
+                            ></DayOfWeek> 
                         )}
                     </div>
                 </div>

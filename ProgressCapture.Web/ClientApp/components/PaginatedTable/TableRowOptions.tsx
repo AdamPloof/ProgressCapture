@@ -53,7 +53,7 @@ export default function TableRowOptions<T extends Identifiable>(
 
     return (
         <Dropdown>
-            <Dropdown.Toggle variant="secondary" id="dropdown-basic" size='sm'>
+            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" size='sm'>
                 <img
                     src={`${URL_IMAGE_ROOT}/icons/edit_document_dark.svg`}
                     alt="Progress entry options"

@@ -6,7 +6,7 @@ import {
     ProgressStat
 } from "./entities";
 
-export type ControlType = 'calendar' | 'list';
+export type ControlType = 'calendar-month' | 'calendar-week' | 'list';
 
 export interface NavbarProps {
     goals: Goal[];
@@ -162,7 +162,7 @@ export interface TableRowOptionsProps<T> {
 /**
  * DayOfMonth component for MonthlyCalendar
  */
-export interface DayOfMonthProps {
+export interface CalendarDayProps {
     date: Date;
     progressEntries: ProgressEntry[];
     progressTypeColorMap: Map<number, number>;

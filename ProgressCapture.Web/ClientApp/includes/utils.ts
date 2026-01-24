@@ -77,6 +77,20 @@ export function replaceUrlPlaceholders(url: string, replacements: string[]): str
 }
 
 /**
+ * Get the date for Sunday of the current week. Useful for calendars.
+ */
+export function getSundayOfCurrentWeek(): Date {
+    const today = new Date();
+    const currentDayOfWeek = today.getDay();
+
+    const sunday = new Date(today);
+    sunday.setDate(today.getDate() - currentDayOfWeek);
+    sunday.setHours(0, 0, 0, 0);
+
+    return sunday;
+}
+
+/**
  * Format a Date as a string in yyyy-mm-dd format
  * 
  * @param {Date} date
@@ -119,6 +133,17 @@ export function longMonthName(date: Date): string {
     ];
 
     return MONTHS[date.getMonth()];
+}
+
+/**
+ * Helper function for shortening text.
+ */
+export function trimText(title: string, maxLen: number = 20): string {
+    if (title.length <= maxLen) {
+        return title;
+    }
+
+    return `${title.substring(0, maxLen - 3)}...`;
 }
 
 /**

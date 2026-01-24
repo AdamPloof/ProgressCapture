@@ -1,7 +1,8 @@
 import React, { JSX, useState, useEffect, useMemo } from 'react';
 import Button from 'react-bootstrap/Button'
 import ProgressTable from './ProgressTable/ProgressTable';
-import ProgressCalendar from './ProgressCalendar/ProgressCalendar';
+import MonthCalendar from './ProgressCalendar/MonthCalendar';
+import WeekCalendar from './ProgressCalendar/WeekCalendar';
 import Navbar from './Common/Navbar';
 import SummarySidebar from './Common/SummarySidebar';
 import Modal from 'react-bootstrap/Modal';
@@ -11,7 +12,7 @@ import EditProgressModalContent from './Common/EditProgressModalContent';
 import ConfirmationModalContent from './Common/ConfirmationModalContent';
 import AlertDismissible from './Common/AlertDismissable';
 import { ControlType, ProgressManagerProps } from 'types/props';
-import { CAL_DATE_FORMAT_OPS } from '../includes/consts';
+import { CONTROL_TYPES, CAL_DATE_FORMAT_OPS } from '../includes/consts';
 import {
     fetchData,
     replaceUrlPlaceholders,
@@ -495,7 +496,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
 
     const progressControl = (): JSX.Element => {
         switch (controlType) {
-            case 'list':
+            case CONTROL_TYPES.LIST:
                 return (
                     <ProgressTable
                         goal={selectedGoal}
@@ -508,9 +509,9 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                         handleDelete={handleDelete}
                     ></ProgressTable>
                 );
-            case 'calendar':
+            case CONTROL_TYPES.CALENDAR_MONTH:
                 return (
-                    <ProgressCalendar
+                    <MonthCalendar
                         goal={selectedGoal}
                         entries={progressEntries}
                         goalLoading={goalLoading}
@@ -519,7 +520,20 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                         handleCreate={handleCreate}
                         handleEdit={handleEdit}
                         handleDelete={handleDelete}
-                    ></ProgressCalendar>
+                    ></MonthCalendar>
+                );
+            case CONTROL_TYPES.CALENDAR_WEEK:
+                return (
+                    <WeekCalendar
+                        goal={selectedGoal}
+                        entries={progressEntries}
+                        goalLoading={goalLoading}
+                        progressLoading={progressLoading}
+                        handleView={handleView}
+                        handleCreate={handleCreate}
+                        handleEdit={handleEdit}
+                        handleDelete={handleDelete}
+                    ></WeekCalendar>
                 );
             default:
                 throw new Error(`Invalid controlType. Expected 'calendar' or 'list', got: ${controlType}`);

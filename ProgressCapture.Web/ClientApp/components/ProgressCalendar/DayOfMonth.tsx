@@ -1,11 +1,10 @@
 import { JSX } from 'react';
 import { ProgressEntry } from 'types/entities';
-import { DayOfMonthProps } from 'types/props';
+import { CalendarDayProps } from 'types/props';
+import { trimText } from '../../includes/utils';
 import { URL_IMAGE_ROOT } from '../../includes/paths';
 
-export default function DayOfMonth(props: DayOfMonthProps): JSX.Element {
-    const MAX_TITLE_LENGTH = 20;
-
+export default function DayOfMonth(props: CalendarDayProps): JSX.Element {
     let isToday = false;
     const today = new Date();
     if (
@@ -19,14 +18,6 @@ export default function DayOfMonth(props: DayOfMonthProps): JSX.Element {
     let labelClass = isToday ? 'calendar-day-label today' : 'calendar-day-label';
     if (!props.inCurrentMonth) {
         labelClass += ' outside-month-day';
-    }
-
-    const trimEntryTitle = (title: string): string => {
-        if (title.length <= MAX_TITLE_LENGTH) {
-            return title;
-        }
-
-        return `${title.substring(0, MAX_TITLE_LENGTH - 3)}...`;
     }
 
     const addBtn = (): JSX.Element => {
@@ -50,22 +41,22 @@ export default function DayOfMonth(props: DayOfMonthProps): JSX.Element {
         }
 
         return (
-                <a
-                    key={`cal_entry_${entry.id}`}
-                    href="#"
-                    className={`calendar-entry cal-entry-color-${colorIdx} d-flex flex-column w-100${idx > 0 ? ' mt-1' : ''}`}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        props.handleView(entry.id);
-                    }}
-                >
-                    <div className="entry-type">
-                        {trimEntryTitle(entry.progressType.name)}
-                    </div>
-                    <div className="entry-amount">
-                        {entry.amount} {entry.progressType.unitOfMeasure.shortName}
-                    </div>
-                </a>
+            <a
+                key={`cal_entry_${entry.id}`}
+                href="#"
+                className={`calendar-entry cal-entry-color-${colorIdx} d-flex flex-column w-100${idx > 0 ? ' mt-1' : ''}`}
+                onClick={(e) => {
+                    e.preventDefault();
+                    props.handleView(entry.id);
+                }}
+            >
+                <div className="entry-type">
+                    {trimText(entry.progressType.name)}
+                </div>
+                <div className="entry-amount">
+                    {entry.amount} {entry.progressType.unitOfMeasure.shortName}
+                </div>
+            </a>
         );
     };
 

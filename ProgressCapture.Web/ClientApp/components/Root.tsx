@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from 'react-dom/client';
 import { ControlType } from "types/props";
+import { CONTROL_TYPES } from "../includes/consts";
 import ProgressManager from "./ProgressManager";
 
 function main(): void {
@@ -14,8 +15,13 @@ function main(): void {
     }
 
     const dataControlType: string = rootContainer.dataset.controlType ?? '';
-    if (dataControlType !== 'calendar' && dataControlType !== 'list') {
-        throw new Error(`Control type must be 'calendar' or 'list'. Got: ${dataControlType}`);
+    if (
+        dataControlType !== CONTROL_TYPES.CALENDAR_MONTH
+        && dataControlType !== CONTROL_TYPES.CALENDAR_WEEK
+        && dataControlType !== CONTROL_TYPES.LIST
+    ) {
+        const validTypes: string = Object.values(CONTROL_TYPES).join(', ');
+        throw new Error(`Control type must be a one of ${validTypes}. Got: ${dataControlType}`);
     }
 
     const goalId = Number(rootContainer.dataset.entityId);

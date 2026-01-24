@@ -1,7 +1,8 @@
 import { JSX, useState } from 'react';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Goal } from '../../types/entities';
-import { NavbarProps } from '../../types/props';
+import { NavbarProps, ControlType } from '../../types/props';
+import { CONTROL_TYPES } from '../../includes/consts';
 import { URL_IMPORT_PROGRESS } from '../../includes/paths';
 import { titleCase } from '../../includes/utils';
 
@@ -24,6 +25,14 @@ export default function Navbar(props: NavbarProps): JSX.Element {
                 })}
             </NavDropdown>
         );
+    };
+
+    const linkClass = (controlType: ControlType): string => {
+        if (props.activeControl === controlType) {
+            return 'nav-link active';
+        }
+
+        return 'nav-link';
     };
 
     return (
@@ -50,21 +59,31 @@ export default function Navbar(props: NavbarProps): JSX.Element {
                     <ul className="navbar-nav navbar-center mb-2 mb-lg-0">
                         <li className="nav-item">
                             <a
-                                className={props.activeControl === 'calendar' ? 'nav-link active' : 'nav-link'}
+                                className={linkClass(CONTROL_TYPES.CALENDAR_MONTH)}
                                 href="#"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    props.handleChangeControlType('calendar');
+                                    props.handleChangeControlType(CONTROL_TYPES.CALENDAR_MONTH);
                                 }}
-                            >Calendar</a>
+                            >Month</a>
                         </li>
                         <li className="nav-item">
                             <a
-                                className={props.activeControl === 'list' ? 'nav-link active' : 'nav-link'}
+                                className={linkClass(CONTROL_TYPES.CALENDAR_WEEK)}
                                 href="#"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    props.handleChangeControlType('list');
+                                    props.handleChangeControlType(CONTROL_TYPES.CALENDAR_WEEK);
+                                }}
+                            >Week</a>
+                        </li>
+                        <li className="nav-item">
+                            <a
+                                className={linkClass(CONTROL_TYPES.LIST)}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    props.handleChangeControlType(CONTROL_TYPES.LIST);
                                 }}
                             >List</a>
                         </li>
