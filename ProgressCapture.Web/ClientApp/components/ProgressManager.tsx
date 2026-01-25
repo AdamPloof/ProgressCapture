@@ -76,6 +76,26 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
         [progressTypes, progressEntries]
     );
 
+    /**
+     * Map of progress type ID to calendar item color index
+     */
+    const progressColorMap: Map<number, number> = useMemo(() => {
+        const colorMap = new Map<number, number>();
+        let currentIdx = 1;
+        for (const entry of progressEntries) {
+            if (!colorMap.has(entry.progressType.id)) {
+                colorMap.set(entry.progressType.id, currentIdx);
+                if (currentIdx === 6) {
+                    currentIdx = 1;
+                } else {
+                    currentIdx++;
+                }
+            }
+        }
+
+        return colorMap;
+    }, [progressEntries])
+
     const handleCloseModal = () => setShowModal(false);
     const handleShowModal = () => setShowModal(true);
     const handleCloseErrorAlert = () => {
@@ -511,6 +531,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                         entries={progressEntries}
                         goalLoading={goalLoading}
                         progressLoading={progressLoading}
+                        progressColorMap={progressColorMap}
                         handleView={handleView}
                         handleCreate={handleCreate}
                         handleEdit={handleEdit}
@@ -524,6 +545,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                         entries={progressEntries}
                         goalLoading={goalLoading}
                         progressLoading={progressLoading}
+                        progressColorMap={progressColorMap}
                         handleView={handleView}
                         handleCreate={handleCreate}
                         handleEdit={handleEdit}
@@ -537,6 +559,7 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                         entries={progressEntries}
                         goalLoading={goalLoading}
                         progressLoading={progressLoading}
+                        progressColorMap={progressColorMap}
                         handleView={handleView}
                         handleCreate={handleCreate}
                         handleEdit={handleEdit}
@@ -574,11 +597,11 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                 </main>
             </div>
 
-            <footer className="border-top footer text-muted">
+            {/* <footer className="border-top footer text-muted">
                 <div className="container">
                     &copy; 2025 - ProgressCapture.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                 </div>
-            </footer>
+            </footer> */}
 
             <ProgressModal
                 show={showModal}

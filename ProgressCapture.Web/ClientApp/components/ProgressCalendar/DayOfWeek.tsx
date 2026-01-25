@@ -20,7 +20,7 @@ export default function DayOfWeek(props: CalendarDayProps): JSX.Element {
     }
 
     const entryRow = (entry: ProgressEntry, idx: number): JSX.Element => {
-        const colorIdx = props.progressTypeColorMap.get(entry.progressType.id);
+        const colorIdx = props.progressColorMap.get(entry.progressType.id);
         if (!colorIdx) {
             throw new Error(`No color index for progress entry type: ${entry.progressType.id}`);
         }
@@ -79,8 +79,14 @@ export default function DayOfWeek(props: CalendarDayProps): JSX.Element {
         );
     };
 
+    const isWeekend = (): boolean => {
+        const day = props.date.getDay();
+
+        return day === 0 || day === 6;
+    }
+
     return (
-        <div className="weekday-content">
+        <div className={isWeekend() ? 'weekday-content weekend-day' : 'weekday-content'}>
             {weekdayLabel()}
             {weekdayBody()}
         </div>

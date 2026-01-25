@@ -30,15 +30,15 @@ $sl-secondary-lighter: #ece3c2;
 $sl-secondary-lightest: #f4f4dc;
 
 // greys
-$sl-grey-darkest: #262622;
-$sl-grey-darkerer: #35352c;
-$sl-grey-darker: #4e4f40;
-$sl-grey-dark: #767769;
-$sl-grey: #b5b6a0;
-$sl-grey-light: #cbccb3;
-$sl-grey-lighter: #e7e8d4;
-$sl-grey-lighterer: #f6f7e9;
-$sl-grey-lightest: #fffffa;
+$sl-grey-darkest: #1d252a;
+$sl-grey-darkerer: #27353a;
+$sl-grey-darker: #384956;
+$sl-grey-dark: #5c6f84;
+$sl-grey: #97acbf;
+$sl-grey-light: #acbfd2;
+$sl-grey-lighter: #d1e4eb;
+$sl-grey-lighterer: #e8f2f7;
+$sl-grey-lightest: #fafdff;
 
 // info
 $sl-info-darkest: #0e1b19;
@@ -77,7 +77,7 @@ $sl-danger-lighter: #e79583;
 $sl-danger-lightest: #f7cfc5;
 
 $library-widget-max-height: 800px;
-$border-main: 1px solid $sl-grey-light;
+$border-main: 1px solid $sl-grey;
 
 // Calendar item colors
 $cal-item-styles: (

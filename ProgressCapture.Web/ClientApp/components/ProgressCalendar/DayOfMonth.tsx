@@ -35,7 +35,7 @@ export default function DayOfMonth(props: CalendarDayProps): JSX.Element {
     };
 
     const entryRow = (entry: ProgressEntry, idx: number): JSX.Element => {
-        const colorIdx = props.progressTypeColorMap.get(entry.progressType.id);
+        const colorIdx = props.progressColorMap.get(entry.progressType.id);
         if (!colorIdx) {
             throw new Error(`No color index for progress entry type: ${entry.progressType.id}`);
         }

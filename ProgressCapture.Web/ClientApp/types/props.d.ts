@@ -15,6 +15,11 @@ export interface NavbarProps {
     handleChangeControlType(controlType: ControlType): void;
 }
 
+export interface ControlSelectProps {
+    activeControl: ControlType;
+    handleChangeControlType(controlType: ControlType): void;
+}
+
 export interface ProgressModalProps {
     show: boolean;
     handleShow(): void;
@@ -96,6 +101,7 @@ export interface ProgressControlProps {
     entries: ProgressEntry[];
     goalLoading: boolean;
     progressLoading: boolean;
+    progressColorMap: Map<number, number>;
     handleView: HandleViewFunc;
     handleCreate: HandleCreateFunc;
     handleEdit: HandleEditFunc;
@@ -165,7 +171,7 @@ export interface TableRowOptionsProps<T> {
 export interface CalendarDayProps {
     date: Date;
     progressEntries: ProgressEntry[];
-    progressTypeColorMap: Map<number, number>;
+    progressColorMap: Map<number, number>;
     inCurrentMonth: boolean;
     handleCreate: HandleCreateFunc;
     handleView: HandleViewFunc;

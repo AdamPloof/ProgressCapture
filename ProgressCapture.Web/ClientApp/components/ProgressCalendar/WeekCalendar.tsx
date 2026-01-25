@@ -6,32 +6,7 @@ import { getSundayOfCurrentWeek, formatDateYmd, longMonthName } from '../../incl
 import { URL_IMAGE_ROOT } from '../../includes/paths';
 
 export default function WeekCalendar(props: ProgressControlProps): JSX.Element {
-    const MIN_EMPTY_CELLS = 1;
-    const MAX_EMPTY_CELLS = 5;
-
     const [startOfWeek, setStartOfWeek] = useState<Date>(() => getSundayOfCurrentWeek());
-
-    /**
-     * Map of progress type ID to calendar item color index
-     * 
-     * @todo: move to manager
-     */
-    const progressTypeColorMap: Map<number, number> = useMemo(() => {
-        const colorMap = new Map<number, number>();
-        let currentIdx = 1;
-        for (const entry of props.entries) {
-            if (!colorMap.has(entry.progressType.id)) {
-                colorMap.set(entry.progressType.id, currentIdx);
-                if (currentIdx === 6) {
-                    currentIdx = 1;
-                } else {
-                    currentIdx++;
-                }
-            }
-        }
-
-        return colorMap;
-    }, [props.entries])
 
     /**
      * Map of date string (yyyy-mm-dd) to the progress entries
@@ -147,7 +122,7 @@ export default function WeekCalendar(props: ProgressControlProps): JSX.Element {
                                 handleEdit={props.handleEdit}
                                 handleDelete={props.handleDelete}
                                 progressEntries={dailyEntries.get(formatDateYmd(d)) ?? []}
-                                progressTypeColorMap={progressTypeColorMap}
+                                progressColorMap={props.progressColorMap}
                                 inCurrentMonth={true}
                             ></DayOfWeek> 
                         )}
