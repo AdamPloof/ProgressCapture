@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Identity;
 
 using Serilog;
 using Serilog.Events;
@@ -7,6 +8,7 @@ using Serilog.Events;
 using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Services;
 using ProgressCapture.Web.Configuration;
+using ProgressCapture.Web.Models;
 
 // The initial "bootstrap" logger is able to log errors during start-up. It's completely replaced by the
 // logger configured in `AddSerilog()` below, once configuration and dependency-injection have both been
@@ -53,8 +55,14 @@ try {
         opts.UseSqlite(builder.Configuration.GetConnectionString("ProgressCaptureConnection"));
     });
 
+    // Identity
+    builder.Services.AddDefaultIdentity<AppUser>(opts => {
+        opts.SignIn.RequireConfirmedAccount = true;
+    }).AddEntityFrameworkStores<ProgressCaptureDbContext>();
+
     // Add services to the container.
     builder.Services.AddControllersWithViews();
+    builder.Services.AddRazorPages();
     builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
     builder.Services.AddScoped<IUserGoalLoader, UserGoalLoader>();
     builder.Services.AddScoped<IUploadHelper, ProgressUploadHelper>();
@@ -77,11 +85,12 @@ try {
     app.UseHttpsRedirection();
     app.UseRouting();
 
+    app.UseAuthentication();
     app.UseAuthorization();
     app.UseSerilogRequestLogging();
 
     app.MapStaticAssets();
-
+    app.MapRazorPages();
     app.MapControllers();
 
     app.Run();    

@@ -6,7 +6,7 @@ using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
 using ProgressCapture.Web.ViewModels;
 
-namespace ProgressCapture.Web.Controllers;
+namespace ProgressCapture.Web.Controllers.Web;
 
 [Route("/goal")]
 public class GoalController : Controller {
@@ -83,7 +83,7 @@ public class GoalController : Controller {
         return View(model);
     }
 
-    [HttpPost("edit/{goalId}", Name = "EditGoal")]
+    [HttpPost("edit")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(GoalViewModel model) {
         if (!ModelState.IsValid) {
@@ -127,6 +127,6 @@ public class GoalController : Controller {
         await _context.SaveChangesAsync();
         // TODO: redirect to user's most recent view type (table/calendar)
 
-        return RedirectToRoute("GoalTable", new { goalId = model.Id });
+        return RedirectToRoute("App", new { goalId = model.Id });
     }
 }

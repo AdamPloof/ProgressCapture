@@ -1,5 +1,7 @@
 const base: string = process.env.BASE_URL ?? '';
 export const URL_IMAGE_ROOT = base + "images";
+export const URL_LOGIN = base + "Identity/Account/Login";
+export const URL_LOGOUT = base + "Identity/Account/Logout";
 export const URL_GOAL = base + "api/goal/{id}";
 export const URL_GOALS = base + "api/goal/all";
 export const URL_GOAL_PROGRESS = base + "api/goal/{id}/progress";

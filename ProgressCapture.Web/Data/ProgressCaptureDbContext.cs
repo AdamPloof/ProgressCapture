@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 using ProgressCapture.Web.Models;
 using ProgressCapture.Web.Extensions;
 
 namespace ProgressCapture.Web.Data;
 
-public class ProgressCaptureDbContext : DbContext {
+public class ProgressCaptureDbContext : IdentityDbContext<AppUser> {
     public DbSet<Goal>          Goals { get; set; } = null!;
     public DbSet<ProgressType>  ProgressTypes { get; set; } = null!;
     public DbSet<ProgressEntry> ProgressEntries { get; set; } = null!;

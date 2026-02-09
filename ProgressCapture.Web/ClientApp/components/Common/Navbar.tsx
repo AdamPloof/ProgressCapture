@@ -2,7 +2,12 @@ import { JSX } from 'react';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import ControlSelect from './ControlSelect';
 import { NavbarProps } from '../../types/props';
-import { URL_IMPORT_PROGRESS, URL_NEW_GOAL } from '../../includes/paths';
+import {
+    URL_LOGIN,
+    URL_LOGOUT,
+    URL_IMPORT_PROGRESS,
+    URL_NEW_GOAL
+} from '../../includes/paths';
 import { titleCase } from '../../includes/utils';
 
 export default function Navbar(props: NavbarProps): JSX.Element {
@@ -60,7 +65,7 @@ export default function Navbar(props: NavbarProps): JSX.Element {
                     {/* Nav right */}
                     <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <a href="#" className='nav-link'>Login</a>
+                            <a href={URL_LOGIN} className='nav-link'>Login</a>
                         </li>
                     </ul>
                 </div>

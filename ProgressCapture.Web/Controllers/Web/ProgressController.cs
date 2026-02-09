@@ -7,7 +7,7 @@ using ProgressCapture.Web.ViewModels;
 using ProgressCapture.Web.Exceptions;
 using ProgressCapture.Web.Extensions;
 
-namespace ProgressCapture.Web.Controllers;
+namespace ProgressCapture.Web.Controllers.Web;
 
 [Route("/progress")]
 public class ProgressController : Controller {

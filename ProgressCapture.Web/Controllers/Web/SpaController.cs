@@ -4,7 +4,7 @@ using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
 using ProgressCapture.Web.ViewModels;
 
-namespace ProgressCapture.Web.Controllers;
+namespace ProgressCapture.Web.Controllers.Web;
 
 [Route("/app")]
 public class SpaController : Controller {
