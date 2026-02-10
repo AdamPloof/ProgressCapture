@@ -9,6 +9,7 @@ using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Services;
 using ProgressCapture.Web.Configuration;
 using ProgressCapture.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 // The initial "bootstrap" logger is able to log errors during start-up. It's completely replaced by the
 // logger configured in `AddSerilog()` below, once configuration and dependency-injection have both been
@@ -59,6 +60,11 @@ try {
     builder.Services.AddDefaultIdentity<AppUser>(opts => {
         opts.SignIn.RequireConfirmedAccount = true;
     }).AddEntityFrameworkStores<ProgressCaptureDbContext>();
+    builder.Services.AddAuthorization(opts => {
+        opts.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+    });
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
@@ -83,17 +89,18 @@ try {
     }
 
     app.UseHttpsRedirection();
+    app.MapStaticAssets()
+        .AllowAnonymous();
     app.UseRouting();
 
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseSerilogRequestLogging();
 
-    app.MapStaticAssets();
     app.MapRazorPages();
     app.MapControllers();
 
-    app.Run();    
+    app.Run();
 } catch (Exception ex) {
     Log.Fatal(ex, "Application terminated unexpectedly");
 } finally {
