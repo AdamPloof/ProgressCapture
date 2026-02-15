@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button'
 import ProgressTable from './ProgressTable/ProgressTable';
 import MonthCalendar from './ProgressCalendar/MonthCalendar';
 import WeekCalendar from './ProgressCalendar/WeekCalendar';
-import Navbar from './Common/Navbar';
+import ControlSelect from './Common/ControlSelect';
 import SummarySidebar from './Common/SummarySidebar';
 import Modal from 'react-bootstrap/Modal';
 import ProgressModal from './Common/ProgressModal';
@@ -572,27 +572,35 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
     };
 
     return (
-        <div className="app-layout">
-            <header>
-                <Navbar
-                    goals={goals}
-                    activeControl={controlType}
-                    handleChangeControlType={handleChangeControlType}
-                    handleChangeGoal={handleChangeSelectedGoal}
-                ></Navbar>
-            </header>
-
+        <React.Fragment>
             <div className="container-fluid d-flex flex-column flex-grow-1">
-                {/* Flash Message */}
-
                 <main role="main" className="d-flex flex-column flex-grow-1 pb-3">
                     {error ? errorAlert() : null}
-                    <div className="content-wrapper d-flex flex-row justify-content-between">
-                        {progressControl()}
-                        <SummarySidebar
-                            goal={selectedGoal}
-                            stats={stats}
-                        ></SummarySidebar>
+                    <div className="content-wrapper d-flex flex-column w-100">
+                        <div className="manager-content-grid">
+                            <div className="grid-item">
+                                <div className="control-select">
+                                    <ControlSelect
+                                        activeControl={controlType}
+                                        handleChangeControlType={handleChangeControlType}
+                                    ></ControlSelect>
+                                </div>
+                            </div>
+                            <div className="grid-item"></div>
+                            <div className="grid-item">
+                                <div className="control-main">
+                                    {progressControl()}
+                                </div>
+                            </div>
+                            <div className="grid-item">
+                                <div className="summary-sidebar">
+                                    <SummarySidebar
+                                        goal={selectedGoal}
+                                        stats={stats}
+                                    ></SummarySidebar>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
@@ -609,6 +617,6 @@ export default function ProgressManager(props: ProgressManagerProps): JSX.Elemen
                 handleClose={handleCloseModal}
                 content={getModalContent()}
             ></ProgressModal>
-        </div>
+        </React.Fragment>
     );
 }

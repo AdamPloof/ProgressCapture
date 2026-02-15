@@ -230,18 +230,20 @@ export default function PaginatedTable<T extends Identifiable>(
     const pageEnd = pageStart + pageSize;
 
     return (
-        <div className="paginated-table-container d-flex flex-column">
-            <table className={props.tableClass ? props.tableClass : "table"}>
-                <thead>
-                    {tableHeaders()}
-                </thead>
-                <tbody>
-                    {sortedValues.slice(pageStart, pageEnd).map(tableRow)}
-                </tbody>
-            </table>
-            <div className="page-control-footer d-flex flex-row justify-content-center align-items-center">
+        <React.Fragment>
+            <div className="paginated-table-container d-flex flex-column">
+                <table className={props.tableClass ? props.tableClass : "table"}>
+                    <thead>
+                        {tableHeaders()}
+                    </thead>
+                    <tbody>
+                        {sortedValues.slice(pageStart, pageEnd).map(tableRow)}
+                    </tbody>
+                </table>
+            </div>
+            <div className="page-control-footer d-flex flex-row justify-content-center align-items-center border-top">
                 {paginator()}
             </div>
-        </div>
+        </React.Fragment>
     );
 }

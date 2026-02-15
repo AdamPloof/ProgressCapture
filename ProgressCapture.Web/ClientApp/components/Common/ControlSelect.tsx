@@ -13,56 +13,58 @@ export default function ControlSelect(props: ControlSelectProps): JSX.Element {
     };
 
     return (
-        <div
-            className="btn-group navbar-nav navbar-center nav-control-btns mb-2 mb-lg-0"
-            role="group"
-            aria-label="Calendar type and list select buttons"
-        >
-            <button
-                type="button"
-                className={linkClass(CONTROL_TYPES.CALENDAR_MONTH)}
-                onClick={(e) => {
-                        e.preventDefault();
-                        props.handleChangeControlType(CONTROL_TYPES.CALENDAR_MONTH);
-                    }}
+        <div className="d-flex flex-row w-100 pt-2 pb-2 justify-content-center mb-3">
+            <div
+                className="btn-group d-flex flex-row justify-content-between nav-control-btns mb-2 mb-lg-0"
+                role="group"
+                aria-label="Calendar type and list select buttons"
             >
-                <img
-                    src={`${URL_IMAGE_ROOT}/icons/calendar_month_dark.svg`}
-                    className='me-2'
-                    alt="Month Calendar Icon"
-                />
-                Month
-            </button>
-            <button
-                type="button"
-                className={linkClass(CONTROL_TYPES.CALENDAR_WEEK)}
-                onClick={(e) => {
-                        e.preventDefault();
-                        props.handleChangeControlType(CONTROL_TYPES.CALENDAR_WEEK);
-                    }}
-            >
-                <img
-                    src={`${URL_IMAGE_ROOT}/icons/calendar_week_dark.svg`}
-                    className='me-2'
-                    alt="Week Calendar Icon"
-                />
-                Week
-            </button>
-            <button
-                type="button"
-                className={linkClass(CONTROL_TYPES.LIST)}
-                onClick={(e) => {
-                        e.preventDefault();
-                        props.handleChangeControlType(CONTROL_TYPES.LIST);
-                    }}
-            >
-                <img
-                    src={`${URL_IMAGE_ROOT}/icons/list_dark.svg`}
-                    className='me-2'
-                    alt="List Icon"
-                />
-                List
-            </button>
+                <button
+                    type="button"
+                    className={linkClass(CONTROL_TYPES.CALENDAR_MONTH)}
+                    onClick={(e) => {
+                            e.preventDefault();
+                            props.handleChangeControlType(CONTROL_TYPES.CALENDAR_MONTH);
+                        }}
+                >
+                    <img
+                        src={`${URL_IMAGE_ROOT}/icons/calendar_month_dark.svg`}
+                        className='me-2'
+                        alt="Month Calendar Icon"
+                    />
+                    Month
+                </button>
+                <button
+                    type="button"
+                    className={linkClass(CONTROL_TYPES.CALENDAR_WEEK)}
+                    onClick={(e) => {
+                            e.preventDefault();
+                            props.handleChangeControlType(CONTROL_TYPES.CALENDAR_WEEK);
+                        }}
+                >
+                    <img
+                        src={`${URL_IMAGE_ROOT}/icons/calendar_week_dark.svg`}
+                        className='me-2'
+                        alt="Week Calendar Icon"
+                    />
+                    Week
+                </button>
+                <button
+                    type="button"
+                    className={linkClass(CONTROL_TYPES.LIST)}
+                    onClick={(e) => {
+                            e.preventDefault();
+                            props.handleChangeControlType(CONTROL_TYPES.LIST);
+                        }}
+                >
+                    <img
+                        src={`${URL_IMAGE_ROOT}/icons/list_dark.svg`}
+                        className='me-2'
+                        alt="List Icon"
+                    />
+                    List
+                </button>
+            </div>
         </div>
     );
 }

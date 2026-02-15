@@ -8,7 +8,7 @@ import {
 
 export type ControlType = 'calendar-month' | 'calendar-week' | 'list';
 
-export interface NavbarProps {
+export interface AppControlsProps {
     goals: Goal[];
     activeControl: ControlType;
     handleChangeGoal(goal: Goal): void;

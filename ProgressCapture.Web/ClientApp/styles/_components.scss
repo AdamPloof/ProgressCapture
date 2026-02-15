@@ -146,6 +146,57 @@ a.col-sort-link {
     height: min-content;
 }
 
+.content-wrapper {
+    height: 100vh;
+}
+
+.progress-manager {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+
+.manager-content-grid {
+    width: 100%;
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-template-columns: 3fr 1fr;
+    flex: 1 1 auto;
+
+    .grid-item {
+        display: flex;
+
+        & > * {
+            width: 100%;
+        }
+    }
+}
+
+.control-main {
+    display: flex;
+    max-height: 82vh;
+}
+
+.goal-manager-header {
+    flex: 0 0 auto;
+}
+
+.paginated-table-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+
+.page-control-footer {
+    flex: 0 0 auto;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+
+    ul.pagination {
+        margin-bottom: 0;
+    }
+}
+
 // Progress Calendar
 .calendar-wrapper {
     width: 100%;
