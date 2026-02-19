@@ -20,5 +20,9 @@ public class Goal {
     [StringLength(1024, ErrorMessage = "Maximum length is {1}")]
     public string? Description { get; set; }
 
+    [Required]
+    public required string AppUserId { get; set; }
+    public AppUser User { get; set; } = null!;
+
     public ICollection<ProgressType> ProgressTypes { get; set; } = new List<ProgressType>();
 }

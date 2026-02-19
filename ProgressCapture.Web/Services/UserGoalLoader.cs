@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+
 using ProgressCapture.Web.Data;
+using ProgressCapture.Web.Models;
 using ProgressCapture.Web.ViewModels;
 
 namespace ProgressCapture.Web.Services;
@@ -11,17 +13,21 @@ namespace ProgressCapture.Web.Services;
 /// </summary>
 public class UserGoalLoader : IUserGoalLoader {
     private ProgressCaptureDbContext _context;
+    private readonly IServiceSecurity _security;
 
-    public UserGoalLoader(ProgressCaptureDbContext context) {
+    public UserGoalLoader(ProgressCaptureDbContext context, IServiceSecurity security) {
         _context = context;
+        _security = security;
     }
 
-    public async Task<IReadOnlyList<NavGoalViewModel>> GetGoalsForUserAsync(
-        int userId,
-        int maxGoals = 5
-    ) {
+    public async Task<IReadOnlyList<NavGoalViewModel>> GetGoalsForUserAsync(int maxGoals = 5) {
+        AppUser? currentUser = await _security.GetCurrentUser();
+        if (currentUser == null) {
+            return new List<NavGoalViewModel>();
+        }
+
         return await _context.Goals
-            .Where(g => g.Id > 0)
+            .Where(g => g.AppUserId == currentUser.Id)
             .Take(maxGoals)
             .Select(g => new NavGoalViewModel() {
                 Id = g.Id,

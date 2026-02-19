@@ -4,7 +4,6 @@ using CsvHelper;
 using CsvHelper.Configuration;
 
 using ProgressCapture.Web.Models;
-using Microsoft.VisualBasic;
 
 namespace ProgressCapture.Web.Services;
 

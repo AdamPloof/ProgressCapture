@@ -6,5 +6,5 @@ using ProgressCapture.Web.Models;
 namespace ProgressCapture.Web.Services;
 
 public interface IUploadHelper {
-    public List<ProgressEntry> ReadProgress(IFormFile file);
+    public Task<List<ProgressEntry>> ReadProgress(IFormFile file);
 }

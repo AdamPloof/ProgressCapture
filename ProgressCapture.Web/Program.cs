@@ -69,6 +69,8 @@ try {
     // Add services to the container.
     builder.Services.AddControllersWithViews();
     builder.Services.AddRazorPages();
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<IServiceSecurity, ServiceSecurity>();
     builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
     builder.Services.AddScoped<IUserGoalLoader, UserGoalLoader>();
     builder.Services.AddScoped<IUploadHelper, ProgressUploadHelper>();

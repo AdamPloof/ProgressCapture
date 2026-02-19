@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
@@ -11,14 +12,23 @@ namespace ProgressCapture.Web.Controllers.Web;
 [Route("/goal")]
 public class GoalController : Controller {
     private ProgressCaptureDbContext _context;
+    private UserManager<AppUser> _userManager;
 
-    public GoalController(ProgressCaptureDbContext context) {
+    public GoalController(ProgressCaptureDbContext context, UserManager<AppUser> userManager) {
         _context = context;
+        _userManager = userManager;
     }
 
     [HttpGet("list", Name = "ListGoals")]
     public async Task<IActionResult> List() {
-        List<GoalViewModel> goals = await _context.Goals.Select(g =>
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null) {
+            return Unauthorized();
+        }        
+
+        List<GoalViewModel> goals = await _context.Goals
+            .Where(g => g.AppUserId == currentUser.Id)
+            .Select(g =>
             new GoalViewModel() {
                 Id = g.Id,
                 Name = g.Name,
@@ -41,9 +51,15 @@ public class GoalController : Controller {
             return View(model);
         }
 
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null) {
+            return Unauthorized();
+        }
+
         await _context.Goals.AddAsync(new Goal() {
             Name = model.Name,
-            Description = model.Description
+            Description = model.Description,
+            AppUserId = currentUser.Id
         });
         await _context.SaveChangesAsync();
 
@@ -61,6 +77,12 @@ public class GoalController : Controller {
         Goal? goal = await _context.Goals.FindAsync(goalId);
         if (goal == null) {
             return NotFound();
+        }
+
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null || goal.AppUserId != currentUser.Id) {
+            // TODO: should we return NotFound instead to obscure the IDs of other user's goals?
+            return Unauthorized();
         }
 
         IEnumerable<ProgressType> progressTypes = _context.ProgressTypes.Where(p => p.GoalId == goalId);
@@ -95,14 +117,22 @@ public class GoalController : Controller {
             return NotFound($"Could not find goal for ID: {model.Id}");
         }
 
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null || goal.AppUserId != currentUser.Id) {
+            return Unauthorized();
+        }
+
         goal.Name = model.Name;
         goal.Description = model.Description;
         foreach (ProgressTypeViewModel ptModel in model.ProgressTypes) {
             if (ptModel.Id != null) {
-                // 
                 ProgressType? progressType = await _context.ProgressTypes.FindAsync(ptModel.Id);
                 if (progressType == null) {
                     return NotFound($"Could not find progress type for ID: {ptModel.Id}");
+                }
+
+                if (progressType.GoalId != goal.Id) {
+                    throw new ArgumentException($"Invalid Goal ID for Progress Type {progressType.Id}");
                 }
 
                 progressType.Name = ptModel.Name;

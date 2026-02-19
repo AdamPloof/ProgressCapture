@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using ProgressCapture.Web.ViewModels;
 using ProgressCapture.Web.Services;
 
+/// <summary>
+/// Dropdown menu in navbar for user goals
+/// </summary>
 public class NavGoalsViewComponent : ViewComponent {
     private readonly IUserGoalLoader _goalLoader;
 
@@ -11,8 +14,7 @@ public class NavGoalsViewComponent : ViewComponent {
     }
 
     public async Task<IViewComponentResult> InvokeAsync(int maxGoals = 5) {
-        // TODO: get User ID view user manager
-        IReadOnlyList<NavGoalViewModel> goals = await _goalLoader.GetGoalsForUserAsync(1, maxGoals);
+        IReadOnlyList<NavGoalViewModel> goals = await _goalLoader.GetGoalsForUserAsync(maxGoals);
 
         return View(goals);
     }

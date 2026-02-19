@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 
 using ProgressCapture.Web.Data;
 using ProgressCapture.Web.Models;
@@ -9,9 +10,11 @@ namespace ProgressCapture.Web.Controllers.Web;
 [Route("/app")]
 public class SpaController : Controller {
     private ProgressCaptureDbContext _context;
+    private readonly UserManager<AppUser> _userManager;
 
-    public SpaController(ProgressCaptureDbContext context) {
+    public SpaController(ProgressCaptureDbContext context, UserManager<AppUser> userManager) {
         _context = context;
+        _userManager = userManager;
     }
 
     [HttpGet("{goalId?}", Name = "App")]
@@ -22,6 +25,11 @@ public class SpaController : Controller {
         Goal? goal = await _context.Goals.FindAsync(goalId ?? 1);
         if (goal == null) {
             return NotFound();
+        }
+
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null || goal.AppUserId != currentUser.Id) {
+            return Unauthorized();
         }
 
         return View(new SpaRootViewModel() {

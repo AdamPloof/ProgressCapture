@@ -1,6 +1,4 @@
-using System.IO;
-using System.Net;
-using System.Collections.Generic;
+using System.Security.Authentication;
 using System.Globalization;
 using Microsoft.Extensions.Options;
 
@@ -21,6 +19,7 @@ public class ProgressUploadHelper : IUploadHelper {
     private int _maxFileSizeBytes;
     private readonly IProgressRepository _progressRepo;
     private readonly ILogger<ProgressUploadHelper> _logger;
+    private readonly IServiceSecurity _security;
     private List<string> _errors;
     private Dictionary<string, Goal> _goalCache;
     private Dictionary<string, ProgressType> _typeCache;
@@ -28,17 +27,19 @@ public class ProgressUploadHelper : IUploadHelper {
     public ProgressUploadHelper(
         IOptions<FileUploadOptions> options,
         IProgressRepository progressRepo,
-        ILogger<ProgressUploadHelper> logger
+        ILogger<ProgressUploadHelper> logger,
+        IServiceSecurity security
     ) {
         _maxFileSizeBytes = options.Value.MaxFileSizeBytes;
         _progressRepo = progressRepo;
         _logger = logger;
+        _security = security;
         _errors = [];
         _goalCache = [];
         _typeCache = [];
     }
 
-    public List<ProgressEntry> ReadProgress(IFormFile file) {
+    public async Task<List<ProgressEntry>> ReadProgress(IFormFile file) {
         _errors.Clear();
         ValidateFile(file);
         if (!IsValid()) {
@@ -58,8 +59,8 @@ public class ProgressUploadHelper : IUploadHelper {
                 _logger.LogDebug(progress.ToString());
 
                 // TODO: Handle integer IDs for goals/types
-                Goal goal = GetGoalByName(progress.Goal);
-                ProgressType type = GetProgressTypeByName(goal.Id, progress.Type);
+                Goal goal = await GetGoalByName(progress.Goal);
+                ProgressType type = await GetProgressTypeByName(goal, progress.Type);
                 entries.Add(new ProgressEntry() {
                     Date = progress.Date,
                     Amount = progress.Amount,
@@ -73,22 +74,51 @@ public class ProgressUploadHelper : IUploadHelper {
         return entries;
     }
 
-    private Goal GetGoalByName(string goalName) {
+    private async Task<Goal> GetGoalByName(string goalName) {
+        if (_goalCache.TryGetValue(goalName, out Goal? goal)) {
+            return goal;
+        }
+
+        AppUser? currentUser = await _security.GetCurrentUser();
+        if (currentUser == null) {
+            throw new AuthenticationException("Unable import progress: failed to load current user");
+        }
+
         List<Goal> goals = _progressRepo.GetGoalsByName(goalName).ToList();
-        if (goals.Count > 1 || goals.Count == 0) {
+        if (goals.Count != 1) {
             throw new InvalidUploadException($"Expected one Goal for name {goalName}, got {goals.Count}");
         }
 
+        if (goals[0].AppUserId != currentUser.Id) {
+            throw new InvalidUploadException($"Unable to find goal for name: {goalName}");
+        }
+
+        _goalCache.Add(goals[0].Name, goals[0]);
+
         return goals[0];
     }
-    
-    private ProgressType GetProgressTypeByName(int goalId, string typeName) {
-        List<ProgressType> types = _progressRepo.GetProgressTypesByName(goalId, typeName).ToList();
-        if (types.Count > 1 || types.Count == 0) {
+
+    private async Task<ProgressType> GetProgressTypeByName(Goal goal, string typeName) {
+        if (_typeCache.TryGetValue(typeName, out ProgressType? type)) {
+            return type;
+        }
+
+        // TODO: should probably not make the upload helper responsible for enforcing security.
+        AppUser? currentUser = await _security.GetCurrentUser();
+        if (currentUser == null) {
+            throw new AuthenticationException("Unable import progress: failed to load current user");
+        } else if (goal.AppUserId != currentUser.Id) {
+            throw new AuthenticationException($"No goal for ID {goal.Id} found for user");
+        }
+
+        List<ProgressType> types = _progressRepo.GetProgressTypesByName(goal.Id, typeName).ToList();
+        if (types.Count != 1) {
             throw new InvalidUploadException(
-                $"Expected one Type for goal ID {goalId} and name {typeName}, got {types.Count}"
+                $"Expected one Type for goal ID {goal.Id} and name {typeName}, got {types.Count}"
             );
         }
+
+        _typeCache.Add(types[0].Name, types[0]);
 
         return types[0];
     }
