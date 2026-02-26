@@ -67,7 +67,11 @@ public class ProgressController : ControllerBase {
             return BadRequest(e.Message);
         }
 
-        ProgressEntry? entry = await _context.ProgressEntries.FindAsync(entryId);
+        ProgressEntry? entry = await _context.ProgressEntries
+            .Include(p => p.ProgressType)
+                .ThenInclude(pt => pt.Goal)
+            .FirstOrDefaultAsync(p => p.Id == entryId);
+
         if (entry == null) {
             return BadRequest($"Could not update progress entry. No entry found for ID: {entryId}");
         }
@@ -118,7 +122,9 @@ public class ProgressController : ControllerBase {
         }
 
         _currentUser = currentUser;
-        ProgressType? progressType = await _context.ProgressTypes.FindAsync(model.ProgressTypeId);
+        ProgressType? progressType = await _context.ProgressTypes
+            .Include(pt => pt.Goal)
+            .FirstOrDefaultAsync(pt => pt.Id == model.ProgressTypeId);
         if (progressType == null) {
             throw new ArgumentException($"Could not find ProgressType for ID {model.ProgressTypeId}");
         }

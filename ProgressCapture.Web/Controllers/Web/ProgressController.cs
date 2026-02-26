@@ -45,14 +45,14 @@ public class ProgressController : Controller {
 
         try {
             List<ProgressEntry> entries = await _uploadHelper.ReadProgress(model.File);
-            foreach (ProgressEntry entry in entries) {
-                Goal goal = entry.ProgressType.Goal;
-                if (goal.AppUserId != currentUser.Id) {
-                    return Unauthorized();
-                }
+            if (!await UploadIsAuthorized(entries)) {
+                return Unauthorized();
+            }
 
+            foreach (ProgressEntry entry in entries) {
                 await _context.ProgressEntries.AddAsync(entry);
             }
+
             await _context.SaveChangesAsync();
             FlashMessage flash = new() {
                 Title = "Import Complete",
@@ -99,5 +99,27 @@ public class ProgressController : Controller {
         string filename = $"{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_progress.csv";
 
         return File(contents, "text/csv", filename);
+    }
+
+    /// <summary>
+    /// Returns true if the current user is logged in and owns all goals for the
+    /// progress entries being uploaded.
+    /// </summary>
+    /// <param name="entries"></param>
+    /// <returns></returns>
+    private async Task<bool> UploadIsAuthorized(IEnumerable<ProgressEntry> entries) {
+        AppUser? currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null) {
+            return false;
+        }
+
+        foreach (ProgressEntry entry in entries) {
+            Goal goal = entry.ProgressType.Goal;
+            if (goal.AppUserId != currentUser.Id) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
